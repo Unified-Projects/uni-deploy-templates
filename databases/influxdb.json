@@ -1,0 +1,133 @@
+{
+  "id": "influxdb",
+  "name": "influxdb",
+  "displayName": "InfluxDB",
+  "description": "Time-series database for metrics and events",
+  "longDescription": "InfluxDB is an open-source time series database designed to handle high write and query loads. It's useful for storing and analyzing metrics, events, and real-time analytics.",
+  "category": "database",
+  "tags": ["database", "timeseries", "metrics", "monitoring"],
+  "icon": {
+    "type": "simpleicons",
+    "value": "influxdb",
+    "color": "#22ADF6"
+  },
+  "version": "1.0.0",
+  "image": "influxdb",
+  "imageTag": "2.7-alpine",
+  "imageTags": [
+    {"tag": "2.7-alpine", "label": "InfluxDB 2.7 (Alpine)", "recommended": true},
+    {"tag": "2.6-alpine", "label": "InfluxDB 2.6 (Alpine)"},
+    {"tag": "1.8-alpine", "label": "InfluxDB 1.8 (Legacy)"}
+  ],
+  "replication": {
+    "canReplicate": false,
+    "defaultReplicas": 1,
+    "warnings": ["InfluxDB Enterprise required for clustering"],
+    "recommendations": "Use InfluxDB Cloud or Enterprise for HA"
+  },
+  "updateStrategy": {"type": "recreate"},
+  "requiredVariables": [
+    {
+      "key": "DOCKER_INFLUXDB_INIT_USERNAME",
+      "description": "Initial admin username",
+      "required": true
+    },
+    {
+      "key": "DOCKER_INFLUXDB_INIT_PASSWORD",
+      "description": "Initial admin password",
+      "required": true,
+      "secret": true,
+      "validation": {"minLength": 8}
+    },
+    {
+      "key": "DOCKER_INFLUXDB_INIT_ORG",
+      "description": "Initial organization name",
+      "required": true
+    },
+    {
+      "key": "DOCKER_INFLUXDB_INIT_BUCKET",
+      "description": "Initial bucket name",
+      "required": true
+    }
+  ],
+  "optionalVariables": [
+    {
+      "key": "DOCKER_INFLUXDB_INIT_ADMIN_TOKEN",
+      "description": "Initial admin API token (auto-generated if not set)",
+      "required": false,
+      "secret": true
+    }
+  ],
+  "exposedVariables": [
+    {
+      "key": "INFLUXDB_URL",
+      "description": "InfluxDB HTTP API URL",
+      "formula": "http://${service_name}:${port}",
+      "dependencies": [],
+      "example": "http://influxdb:8086"
+    },
+    {
+      "key": "INFLUXDB_HOST",
+      "description": "InfluxDB hostname",
+      "formula": "${service_name}",
+      "dependencies": []
+    },
+    {
+      "key": "INFLUXDB_PORT",
+      "description": "InfluxDB HTTP port",
+      "formula": "${port}",
+      "dependencies": []
+    },
+    {
+      "key": "INFLUXDB_ORG",
+      "description": "InfluxDB organization",
+      "formula": "${DOCKER_INFLUXDB_INIT_ORG}",
+      "dependencies": ["DOCKER_INFLUXDB_INIT_ORG"]
+    },
+    {
+      "key": "INFLUXDB_BUCKET",
+      "description": "InfluxDB bucket",
+      "formula": "${DOCKER_INFLUXDB_INIT_BUCKET}",
+      "dependencies": ["DOCKER_INFLUXDB_INIT_BUCKET"]
+    }
+  ],
+  "ports": [
+    {"name": "http", "containerPort": 8086, "protocol": "tcp", "expose": true, "description": "HTTP API and UI"}
+  ],
+  "volumes": [
+    {
+      "name": "influxdb-data",
+      "mountPath": "/var/lib/influxdb2",
+      "description": "InfluxDB data and configuration",
+      "sizeRecommendation": "50Gi"
+    }
+  ],
+  "healthCheck": {
+    "test": ["CMD", "influx", "ping"],
+    "interval": 10000000000,
+    "timeout": 5000000000,
+    "retries": 3,
+    "startPeriod": 30000000000
+  },
+  "resources": {
+    "requests": {"cpu": "0.5", "memory": "512m"},
+    "limits": {"cpu": "2", "memory": "2g"},
+    "profiles": [
+      {"name": "small", "label": "Small", "requests": {"cpu": "0.25", "memory": "256m"}, "limits": {"cpu": "0.5", "memory": "512m"}},
+      {"name": "medium", "label": "Medium", "requests": {"cpu": "0.5", "memory": "512m"}, "limits": {"cpu": "1", "memory": "1g"}},
+      {"name": "large", "label": "Large", "requests": {"cpu": "1", "memory": "1g"}, "limits": {"cpu": "2", "memory": "2g"}}
+    ]
+  },
+  "documentation": {
+    "officialDocs": "https://docs.influxdata.com/influxdb/",
+    "dockerHub": "https://hub.docker.com/_/influxdb",
+    "github": "https://github.com/influxdata/influxdb",
+    "quickStart": "Access UI at http://localhost:8086. Use username and password to login."
+  },
+  "metadata": {
+    "author": "Uni-Deploy",
+    "license": "MIT",
+    "createdAt": "2025-01-19T00:00:00Z",
+    "updatedAt": "2025-01-19T00:00:00Z"
+  }
+}

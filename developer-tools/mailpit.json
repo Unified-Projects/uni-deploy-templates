@@ -1,0 +1,86 @@
+{
+  "id": "mailpit",
+  "name": "mailpit",
+  "displayName": "Mailpit",
+  "description": "Email testing tool with web UI",
+  "longDescription": "Mailpit is an email testing tool for developers. It acts as an SMTP server, captures emails, and displays them in a web interface. Perfect for development and testing.",
+  "category": "developer-tools",
+  "tags": ["email", "smtp", "testing", "development"],
+  "icon": {
+    "type": "url",
+    "value": "https://raw.githubusercontent.com/axllent/mailpit/develop/server/ui/favicon.svg",
+    "color": "#4A90E2"
+  },
+  "version": "1.0.0",
+  "image": "axllent/mailpit",
+  "imageTag": "latest",
+  "imageTags": [
+    {"tag": "latest", "label": "Mailpit (Latest)", "recommended": true}
+  ],
+  "replication": {
+    "canReplicate": true,
+    "defaultReplicas": 1,
+    "maxReplicas": 2,
+    "recommendations": "Typically one instance is sufficient for development"
+  },
+  "updateStrategy": {
+    "type": "rolling",
+    "rollingUpdate": {"maxUnavailable": 0, "maxSurge": 1}
+  },
+  "requiredVariables": [],
+  "optionalVariables": [],
+  "exposedVariables": [
+    {
+      "key": "MAILPIT_SMTP_HOST",
+      "description": "Mailpit SMTP hostname",
+      "formula": "${service_name}",
+      "dependencies": [],
+      "example": "mailpit"
+    },
+    {
+      "key": "MAILPIT_SMTP_PORT",
+      "description": "Mailpit SMTP port",
+      "formula": "1025",
+      "dependencies": [],
+      "example": "1025"
+    },
+    {
+      "key": "MAILPIT_UI_URL",
+      "description": "Mailpit web UI URL",
+      "formula": "http://${service_name}:8025",
+      "dependencies": [],
+      "example": "http://mailpit:8025"
+    }
+  ],
+  "ports": [
+    {"name": "smtp", "containerPort": 1025, "protocol": "tcp", "description": "SMTP server"},
+    {"name": "http", "containerPort": 8025, "protocol": "tcp", "expose": true, "description": "Web UI"}
+  ],
+  "healthCheck": {
+    "test": ["CMD", "wget", "--spider", "-q", "http://localhost:8025/"],
+    "interval": 10000000000,
+    "timeout": 3000000000,
+    "retries": 3,
+    "startPeriod": 10000000000
+  },
+  "resources": {
+    "requests": {"cpu": "0.05", "memory": "64m"},
+    "limits": {"cpu": "0.25", "memory": "256m"},
+    "profiles": [
+      {"name": "small", "label": "Small", "requests": {"cpu": "0.05", "memory": "64m"}, "limits": {"cpu": "0.1", "memory": "128m"}},
+      {"name": "medium", "label": "Medium", "requests": {"cpu": "0.1", "memory": "128m"}, "limits": {"cpu": "0.25", "memory": "256m"}}
+    ]
+  },
+  "documentation": {
+    "officialDocs": "https://github.com/axllent/mailpit",
+    "dockerHub": "https://hub.docker.com/r/axllent/mailpit",
+    "github": "https://github.com/axllent/mailpit",
+    "quickStart": "Configure your app to send emails to mailpit:1025. View emails at http://localhost:8025"
+  },
+  "metadata": {
+    "author": "Uni-Deploy",
+    "license": "MIT",
+    "createdAt": "2025-01-19T00:00:00Z",
+    "updatedAt": "2025-01-19T00:00:00Z"
+  }
+}

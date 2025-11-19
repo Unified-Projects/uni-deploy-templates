@@ -1,0 +1,122 @@
+{
+  "id": "meilisearch",
+  "name": "meilisearch",
+  "displayName": "Meilisearch",
+  "description": "Lightning-fast search engine that fits effortlessly into your apps",
+  "longDescription": "Meilisearch is an open-source search engine that provides fast, relevant search out of the box. Easy to deploy, with a RESTful API and great defaults.",
+  "category": "search",
+  "tags": ["search", "full-text", "typo-tolerant", "fast"],
+  "icon": {
+    "type": "url",
+    "value": "https://raw.githubusercontent.com/meilisearch/meilisearch/main/assets/logo.svg",
+    "color": "#FF5CAA"
+  },
+  "version": "1.0.0",
+  "image": "getmeili/meilisearch",
+  "imageTag": "latest",
+  "imageTags": [
+    {"tag": "latest", "label": "Meilisearch (Latest)", "recommended": true},
+    {"tag": "v1.5", "label": "Meilisearch 1.5"}
+  ],
+  "replication": {
+    "canReplicate": false,
+    "defaultReplicas": 1,
+    "warnings": ["Meilisearch does not support clustering"],
+    "recommendations": "Single instance only, use load balancer for redundancy"
+  },
+  "updateStrategy": {
+    "type": "recreate"
+  },
+  "requiredVariables": [],
+  "optionalVariables": [
+    {
+      "key": "MEILI_MASTER_KEY",
+      "description": "Master key for API authentication",
+      "required": false,
+      "secret": true,
+      "validation": {"minLength": 16},
+      "helpText": "Required for production, minimum 16 characters"
+    },
+    {
+      "key": "MEILI_ENV",
+      "description": "Environment (development or production)",
+      "default": "development",
+      "required": false,
+      "validation": {"enum": ["development", "production"]}
+    }
+  ],
+  "exposedVariables": [
+    {
+      "key": "MEILI_HTTP_ADDR",
+      "description": "Meilisearch HTTP address",
+      "formula": "${service_name}:${port}",
+      "dependencies": [],
+      "example": "meilisearch:7700"
+    },
+    {
+      "key": "MEILISEARCH_URL",
+      "description": "Meilisearch HTTP API URL",
+      "formula": "http://${service_name}:${port}",
+      "dependencies": [],
+      "example": "http://meilisearch:7700"
+    },
+    {
+      "key": "MEILISEARCH_HOST",
+      "description": "Meilisearch hostname",
+      "formula": "${service_name}",
+      "dependencies": []
+    },
+    {
+      "key": "MEILISEARCH_PORT",
+      "description": "Meilisearch port",
+      "formula": "${port}",
+      "dependencies": []
+    },
+    {
+      "key": "MEILI_MASTER_KEY",
+      "description": "Meilisearch master key",
+      "formula": "${MEILI_MASTER_KEY}",
+      "dependencies": ["MEILI_MASTER_KEY"],
+      "secret": true
+    }
+  ],
+  "ports": [
+    {"name": "http", "containerPort": 7700, "protocol": "tcp", "expose": true, "description": "HTTP API"}
+  ],
+  "volumes": [
+    {
+      "name": "meilisearch-data",
+      "mountPath": "/meili_data",
+      "description": "Meilisearch data directory",
+      "sizeRecommendation": "20Gi"
+    }
+  ],
+  "healthCheck": {
+    "test": ["CMD-SHELL", "wget --spider -q http://localhost:7700/health"],
+    "interval": 10000000000,
+    "timeout": 5000000000,
+    "retries": 3,
+    "startPeriod": 10000000000
+  },
+  "resources": {
+    "requests": {"cpu": "0.25", "memory": "512m"},
+    "limits": {"cpu": "2", "memory": "2g"},
+    "profiles": [
+      {"name": "small", "label": "Small", "requests": {"cpu": "0.25", "memory": "512m"}, "limits": {"cpu": "0.5", "memory": "1g"}},
+      {"name": "medium", "label": "Medium", "requests": {"cpu": "0.5", "memory": "1g"}, "limits": {"cpu": "1", "memory": "2g"}},
+      {"name": "large", "label": "Large", "requests": {"cpu": "1", "memory": "2g"}, "limits": {"cpu": "2", "memory": "4g"}}
+    ]
+  },
+  "documentation": {
+    "officialDocs": "https://docs.meilisearch.com/",
+    "dockerHub": "https://hub.docker.com/r/getmeili/meilisearch",
+    "github": "https://github.com/meilisearch/meilisearch",
+    "quickStart": "Access at http://localhost:7700. Set MEILI_MASTER_KEY for production."
+  },
+  "metadata": {
+    "author": "Uni-Deploy",
+    "license": "MIT",
+    "createdAt": "2025-01-19T00:00:00Z",
+    "updatedAt": "2025-01-19T00:00:00Z"
+  }
+}

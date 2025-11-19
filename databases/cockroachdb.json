@@ -1,0 +1,118 @@
+{
+  "id": "cockroachdb",
+  "name": "cockroachdb",
+  "displayName": "CockroachDB",
+  "description": "Distributed SQL database with PostgreSQL compatibility",
+  "longDescription": "CockroachDB is a distributed SQL database built on a transactional and strongly-consistent key-value store. It scales horizontally, survives disk, machine, rack, and datacenter failures with minimal latency disruption and no manual intervention.",
+  "category": "database",
+  "tags": ["database", "sql", "distributed", "postgresql-compatible"],
+  "icon": {
+    "type": "simpleicons",
+    "value": "cockroachlabs",
+    "color": "#6933FF"
+  },
+  "version": "1.0.0",
+  "image": "cockroachdb/cockroach",
+  "imageTag": "latest-v23.1",
+  "imageTags": [
+    {"tag": "latest-v23.1", "label": "CockroachDB 23.1 (Latest)", "recommended": true},
+    {"tag": "latest-v22.2", "label": "CockroachDB 22.2"}
+  ],
+  "replication": {
+    "canReplicate": true,
+    "defaultReplicas": 3,
+    "minReplicas": 1,
+    "maxReplicas": 100,
+    "warnings": ["Single-node mode is for development only", "Production requires at least 3 nodes for fault tolerance"],
+    "recommendations": "Deploy at least 3 replicas across different availability zones for production HA"
+  },
+  "updateStrategy": {
+    "type": "rolling",
+    "rollingUpdate": {"maxUnavailable": 1, "maxSurge": 0, "delay": 30}
+  },
+  "restartPolicy": "any",
+  "requiredVariables": [],
+  "optionalVariables": [
+    {
+      "key": "COCKROACH_DATABASE",
+      "description": "Default database to create",
+      "default": "defaultdb",
+      "required": false
+    },
+    {
+      "key": "COCKROACH_USER",
+      "description": "Database user to create",
+      "required": false
+    },
+    {
+      "key": "COCKROACH_PASSWORD",
+      "description": "Password for database user",
+      "required": false,
+      "secret": true
+    }
+  ],
+  "exposedVariables": [
+    {
+      "key": "DATABASE_URL",
+      "description": "PostgreSQL-compatible connection string",
+      "formula": "postgresql://${COCKROACH_USER}:${COCKROACH_PASSWORD}@${service_name}:${port}/${COCKROACH_DATABASE}?sslmode=disable",
+      "dependencies": ["COCKROACH_USER", "COCKROACH_PASSWORD", "COCKROACH_DATABASE"],
+      "secret": true,
+      "example": "postgresql://root@cockroach:26257/defaultdb?sslmode=disable"
+    },
+    {
+      "key": "COCKROACH_HOST",
+      "description": "CockroachDB hostname",
+      "formula": "${service_name}",
+      "dependencies": []
+    },
+    {
+      "key": "COCKROACH_PORT",
+      "description": "CockroachDB SQL port",
+      "formula": "${port}",
+      "dependencies": []
+    }
+  ],
+  "ports": [
+    {"name": "sql", "containerPort": 26257, "protocol": "tcp", "description": "SQL client port"},
+    {"name": "http", "containerPort": 8080, "protocol": "tcp", "expose": true, "description": "Admin UI"}
+  ],
+  "commands": ["start-single-node", "--insecure"],
+  "volumes": [
+    {
+      "name": "cockroach-data",
+      "mountPath": "/cockroach/cockroach-data",
+      "description": "CockroachDB data directory",
+      "sizeRecommendation": "20Gi"
+    }
+  ],
+  "healthCheck": {
+    "test": ["CMD", "curl", "-f", "http://localhost:8080/health?ready=1"],
+    "interval": 10000000000,
+    "timeout": 5000000000,
+    "retries": 3,
+    "startPeriod": 30000000000
+  },
+  "resources": {
+    "requests": {"cpu": "0.5", "memory": "512m"},
+    "limits": {"cpu": "4", "memory": "4g"},
+    "profiles": [
+      {"name": "small", "label": "Small (Development)", "requests": {"cpu": "0.25", "memory": "256m"}, "limits": {"cpu": "1", "memory": "1g"}},
+      {"name": "medium", "label": "Medium (Production)", "requests": {"cpu": "0.5", "memory": "512m"}, "limits": {"cpu": "2", "memory": "2g"}},
+      {"name": "large", "label": "Large (High Load)", "requests": {"cpu": "1", "memory": "1g"}, "limits": {"cpu": "4", "memory": "4g"}},
+      {"name": "xlarge", "label": "Extra Large (Enterprise)", "requests": {"cpu": "2", "memory": "2g"}, "limits": {"cpu": "8", "memory": "8g"}}
+    ]
+  },
+  "documentation": {
+    "officialDocs": "https://www.cockroachlabs.com/docs/",
+    "dockerHub": "https://hub.docker.com/r/cockroachdb/cockroach",
+    "github": "https://github.com/cockroachdb/cockroach",
+    "quickStart": "Access admin UI at http://localhost:8080. Default user is 'root' with no password in insecure mode."
+  },
+  "metadata": {
+    "author": "Uni-Deploy",
+    "license": "BSL/Apache 2.0",
+    "createdAt": "2025-01-19T00:00:00Z",
+    "updatedAt": "2025-01-19T00:00:00Z"
+  }
+}

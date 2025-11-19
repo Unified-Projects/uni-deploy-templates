@@ -1,0 +1,120 @@
+{
+  "id": "grafana",
+  "name": "grafana",
+  "displayName": "Grafana",
+  "description": "Analytics and interactive visualization platform",
+  "longDescription": "Grafana is an open source analytics & monitoring solution for every database. Query, visualize, alert on and explore metrics, logs and traces.",
+  "category": "monitoring",
+  "tags": ["monitoring", "visualization", "dashboards", "metrics"],
+  "icon": {
+    "type": "simpleicons",
+    "value": "grafana",
+    "color": "#F46800"
+  },
+  "version": "1.0.0",
+  "image": "grafana/grafana",
+  "imageTag": "latest",
+  "imageTags": [
+    {"tag": "latest", "label": "Grafana (Latest)", "recommended": true},
+    {"tag": "10.2.0", "label": "Grafana 10.2"}
+  ],
+  "replication": {
+    "canReplicate": true,
+    "defaultReplicas": 1,
+    "maxReplicas": 3,
+    "recommendations": "Can be replicated with shared database backend"
+  },
+  "updateStrategy": {
+    "type": "rolling",
+    "rollingUpdate": {"maxUnavailable": 0, "maxSurge": 1}
+  },
+  "requiredVariables": [],
+  "optionalVariables": [
+    {
+      "key": "GF_SECURITY_ADMIN_USER",
+      "description": "Grafana admin username",
+      "default": "admin",
+      "required": false
+    },
+    {
+      "key": "GF_SECURITY_ADMIN_PASSWORD",
+      "description": "Grafana admin password",
+      "default": "admin",
+      "required": false,
+      "secret": true,
+      "helpText": "Change this for production!"
+    }
+  ],
+  "exposedVariables": [
+    {
+      "key": "GRAFANA_URL",
+      "description": "Grafana web UI URL",
+      "formula": "http://${service_name}:${port}",
+      "dependencies": [],
+      "example": "http://grafana:3000"
+    },
+    {
+      "key": "GRAFANA_HOST",
+      "description": "Grafana hostname",
+      "formula": "${service_name}",
+      "dependencies": []
+    },
+    {
+      "key": "GRAFANA_PORT",
+      "description": "Grafana web port",
+      "formula": "${port}",
+      "dependencies": []
+    },
+    {
+      "key": "GF_SECURITY_ADMIN_USER",
+      "description": "Grafana admin username",
+      "formula": "${GF_SECURITY_ADMIN_USER}",
+      "dependencies": ["GF_SECURITY_ADMIN_USER"]
+    },
+    {
+      "key": "GF_SECURITY_ADMIN_PASSWORD",
+      "description": "Grafana admin password",
+      "formula": "${GF_SECURITY_ADMIN_PASSWORD}",
+      "dependencies": ["GF_SECURITY_ADMIN_PASSWORD"],
+      "secret": true
+    }
+  ],
+  "ports": [
+    {"name": "http", "containerPort": 3000, "protocol": "tcp", "expose": true, "description": "Web UI"}
+  ],
+  "volumes": [
+    {
+      "name": "grafana-data",
+      "mountPath": "/var/lib/grafana",
+      "description": "Grafana data directory",
+      "sizeRecommendation": "5Gi"
+    }
+  ],
+  "healthCheck": {
+    "test": ["CMD-SHELL", "wget --spider -q http://localhost:3000/api/health"],
+    "interval": 10000000000,
+    "timeout": 5000000000,
+    "retries": 3,
+    "startPeriod": 30000000000
+  },
+  "resources": {
+    "requests": {"cpu": "0.25", "memory": "256m"},
+    "limits": {"cpu": "1", "memory": "1g"},
+    "profiles": [
+      {"name": "small", "label": "Small", "requests": {"cpu": "0.25", "memory": "256m"}, "limits": {"cpu": "0.5", "memory": "512m"}},
+      {"name": "medium", "label": "Medium", "requests": {"cpu": "0.5", "memory": "512m"}, "limits": {"cpu": "1", "memory": "1g"}}
+    ]
+  },
+  "documentation": {
+    "officialDocs": "https://grafana.com/docs/grafana/latest/",
+    "dockerHub": "https://hub.docker.com/r/grafana/grafana",
+    "github": "https://github.com/grafana/grafana",
+    "quickStart": "Access UI at http://localhost:3000. Default credentials: admin/admin"
+  },
+  "metadata": {
+    "author": "Uni-Deploy",
+    "license": "AGPL-3.0",
+    "createdAt": "2025-01-19T00:00:00Z",
+    "updatedAt": "2025-01-19T00:00:00Z"
+  }
+}

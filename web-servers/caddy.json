@@ -1,0 +1,103 @@
+{
+  "id": "caddy",
+  "name": "caddy",
+  "displayName": "Caddy",
+  "description": "Fast web server with automatic HTTPS",
+  "longDescription": "Caddy is a powerful, enterprise-ready, open source web server with automatic HTTPS written in Go. It's easy to configure and use.",
+  "category": "web-server",
+  "tags": ["web-server", "reverse-proxy", "https", "automatic-tls"],
+  "icon": {
+    "type": "url",
+    "value": "https://caddyserver.com/resources/images/caddy-circle-lock.svg",
+    "color": "#1F88C0"
+  },
+  "version": "1.0.0",
+  "image": "caddy",
+  "imageTag": "alpine",
+  "imageTags": [
+    {"tag": "alpine", "label": "Caddy (Alpine)", "recommended": true},
+    {"tag": "latest", "label": "Caddy (Latest)"}
+  ],
+  "replication": {
+    "canReplicate": true,
+    "defaultReplicas": 1,
+    "minReplicas": 1,
+    "maxReplicas": 10,
+    "recommendations": "Caddy is stateless and can be safely replicated"
+  },
+  "updateStrategy": {
+    "type": "rolling",
+    "rollingUpdate": {"maxUnavailable": 0, "maxSurge": 1}
+  },
+  "requiredVariables": [],
+  "optionalVariables": [],
+  "exposedVariables": [
+    {
+      "key": "CADDY_HOST",
+      "description": "Caddy hostname",
+      "formula": "${service_name}",
+      "dependencies": [],
+      "example": "caddy"
+    },
+    {
+      "key": "CADDY_HTTP_PORT",
+      "description": "Caddy HTTP port",
+      "formula": "${port}",
+      "dependencies": [],
+      "example": "80"
+    },
+    {
+      "key": "CADDY_HTTPS_PORT",
+      "description": "Caddy HTTPS port",
+      "formula": "443",
+      "dependencies": [],
+      "example": "443"
+    }
+  ],
+  "ports": [
+    {"name": "http", "containerPort": 80, "protocol": "tcp", "expose": true, "description": "HTTP"},
+    {"name": "https", "containerPort": 443, "protocol": "tcp", "expose": true, "description": "HTTPS"},
+    {"name": "admin", "containerPort": 2019, "protocol": "tcp", "description": "Admin API"}
+  ],
+  "volumes": [
+    {
+      "name": "caddy-data",
+      "mountPath": "/data",
+      "description": "Caddy data directory (certificates)",
+      "sizeRecommendation": "1Gi"
+    },
+    {
+      "name": "caddy-config",
+      "mountPath": "/config",
+      "description": "Caddy configuration",
+      "sizeRecommendation": "100Mi"
+    }
+  ],
+  "healthCheck": {
+    "test": ["CMD", "caddy", "version"],
+    "interval": 10000000000,
+    "timeout": 3000000000,
+    "retries": 3,
+    "startPeriod": 10000000000
+  },
+  "resources": {
+    "requests": {"cpu": "0.1", "memory": "64m"},
+    "limits": {"cpu": "0.5", "memory": "256m"},
+    "profiles": [
+      {"name": "small", "label": "Small", "requests": {"cpu": "0.1", "memory": "64m"}, "limits": {"cpu": "0.25", "memory": "128m"}},
+      {"name": "medium", "label": "Medium", "requests": {"cpu": "0.25", "memory": "128m"}, "limits": {"cpu": "0.5", "memory": "256m"}}
+    ]
+  },
+  "documentation": {
+    "officialDocs": "https://caddyserver.com/docs/",
+    "dockerHub": "https://hub.docker.com/_/caddy",
+    "github": "https://github.com/caddyserver/caddy",
+    "quickStart": "Caddy starts immediately. Configure via Caddyfile or JSON API."
+  },
+  "metadata": {
+    "author": "Uni-Deploy",
+    "license": "Apache 2.0",
+    "createdAt": "2025-01-19T00:00:00Z",
+    "updatedAt": "2025-01-19T00:00:00Z"
+  }
+}

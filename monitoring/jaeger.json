@@ -1,0 +1,104 @@
+{
+  "id": "jaeger",
+  "name": "jaeger",
+  "displayName": "Jaeger",
+  "description": "Distributed tracing system",
+  "longDescription": "Jaeger is an open-source, end-to-end distributed tracing system. Monitor and troubleshoot transactions in complex distributed systems.",
+  "category": "monitoring",
+  "tags": ["monitoring", "tracing", "distributed", "observability"],
+  "icon": {
+    "type": "url",
+    "value": "https://www.jaegertracing.io/img/jaeger-icon-color.svg",
+    "color": "#60D0E4"
+  },
+  "version": "1.0.0",
+  "image": "jaegertracing/all-in-one",
+  "imageTag": "latest",
+  "imageTags": [
+    {"tag": "latest", "label": "Jaeger All-in-One (Latest)", "recommended": true},
+    {"tag": "1.51", "label": "Jaeger 1.51"}
+  ],
+  "replication": {
+    "canReplicate": false,
+    "defaultReplicas": 1,
+    "warnings": ["All-in-one image is for development/testing only"],
+    "recommendations": "Use production deployment with separate components for production"
+  },
+  "updateStrategy": {
+    "type": "rolling",
+    "rollingUpdate": {"maxUnavailable": 0, "maxSurge": 1}
+  },
+  "requiredVariables": [],
+  "optionalVariables": [
+    {
+      "key": "COLLECTOR_ZIPKIN_HOST_PORT",
+      "description": "Zipkin compatible endpoint port",
+      "default": ":9411",
+      "required": false
+    }
+  ],
+  "exposedVariables": [
+    {
+      "key": "JAEGER_AGENT_HOST",
+      "description": "Jaeger agent hostname",
+      "formula": "${service_name}",
+      "dependencies": [],
+      "example": "jaeger"
+    },
+    {
+      "key": "JAEGER_AGENT_PORT",
+      "description": "Jaeger agent port (compact thrift)",
+      "formula": "6831",
+      "dependencies": [],
+      "example": "6831"
+    },
+    {
+      "key": "JAEGER_COLLECTOR_URL",
+      "description": "Jaeger collector HTTP URL",
+      "formula": "http://${service_name}:14268/api/traces",
+      "dependencies": [],
+      "example": "http://jaeger:14268/api/traces"
+    },
+    {
+      "key": "JAEGER_UI_URL",
+      "description": "Jaeger UI URL",
+      "formula": "http://${service_name}:16686",
+      "dependencies": [],
+      "example": "http://jaeger:16686"
+    }
+  ],
+  "ports": [
+    {"name": "agent-compact", "containerPort": 6831, "protocol": "udp", "description": "Agent compact thrift"},
+    {"name": "agent-binary", "containerPort": 6832, "protocol": "udp", "description": "Agent binary thrift"},
+    {"name": "query-http", "containerPort": 16686, "protocol": "tcp", "expose": true, "description": "Query UI"},
+    {"name": "collector-http", "containerPort": 14268, "protocol": "tcp", "description": "Collector HTTP"},
+    {"name": "collector-grpc", "containerPort": 14250, "protocol": "tcp", "description": "Collector gRPC"}
+  ],
+  "healthCheck": {
+    "test": ["CMD-SHELL", "wget --spider -q http://localhost:14269/"],
+    "interval": 10000000000,
+    "timeout": 5000000000,
+    "retries": 3,
+    "startPeriod": 10000000000
+  },
+  "resources": {
+    "requests": {"cpu": "0.25", "memory": "256m"},
+    "limits": {"cpu": "1", "memory": "1g"},
+    "profiles": [
+      {"name": "small", "label": "Small (Dev)", "requests": {"cpu": "0.25", "memory": "256m"}, "limits": {"cpu": "0.5", "memory": "512m"}},
+      {"name": "medium", "label": "Medium", "requests": {"cpu": "0.5", "memory": "512m"}, "limits": {"cpu": "1", "memory": "1g"}}
+    ]
+  },
+  "documentation": {
+    "officialDocs": "https://www.jaegertracing.io/docs/",
+    "dockerHub": "https://hub.docker.com/r/jaegertracing/all-in-one",
+    "github": "https://github.com/jaegertracing/jaeger",
+    "quickStart": "Access UI at http://localhost:16686. Send traces to port 6831 (UDP) or 14268 (HTTP)."
+  },
+  "metadata": {
+    "author": "Uni-Deploy",
+    "license": "Apache 2.0",
+    "createdAt": "2025-01-19T00:00:00Z",
+    "updatedAt": "2025-01-19T00:00:00Z"
+  }
+}

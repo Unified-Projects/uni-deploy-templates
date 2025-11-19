@@ -1,0 +1,92 @@
+{
+  "id": "loki",
+  "name": "loki",
+  "displayName": "Grafana Loki",
+  "description": "Log aggregation system inspired by Prometheus",
+  "longDescription": "Loki is a horizontally scalable, highly available, multi-tenant log aggregation system inspired by Prometheus. Designed to be cost-effective and easy to operate.",
+  "category": "monitoring",
+  "tags": ["monitoring", "logs", "aggregation", "observability"],
+  "icon": {
+    "type": "url",
+    "value": "https://grafana.com/static/img/logos/logo-loki.svg",
+    "color": "#F46800"
+  },
+  "version": "1.0.0",
+  "image": "grafana/loki",
+  "imageTag": "latest",
+  "imageTags": [
+    {"tag": "latest", "label": "Loki (Latest)", "recommended": true}
+  ],
+  "replication": {
+    "canReplicate": true,
+    "defaultReplicas": 1,
+    "maxReplicas": 5,
+    "recommendations": "Can scale horizontally with proper configuration"
+  },
+  "updateStrategy": {
+    "type": "rolling",
+    "rollingUpdate": {"maxUnavailable": 0, "maxSurge": 1}
+  },
+  "requiredVariables": [],
+  "optionalVariables": [],
+  "exposedVariables": [
+    {
+      "key": "LOKI_URL",
+      "description": "Loki HTTP API URL",
+      "formula": "http://${service_name}:${port}",
+      "dependencies": [],
+      "example": "http://loki:3100"
+    },
+    {
+      "key": "LOKI_HOST",
+      "description": "Loki hostname",
+      "formula": "${service_name}",
+      "dependencies": []
+    },
+    {
+      "key": "LOKI_PORT",
+      "description": "Loki HTTP port",
+      "formula": "${port}",
+      "dependencies": []
+    }
+  ],
+  "ports": [
+    {"name": "http", "containerPort": 3100, "protocol": "tcp", "expose": true, "description": "HTTP API"}
+  ],
+  "volumes": [
+    {
+      "name": "loki-data",
+      "mountPath": "/loki",
+      "description": "Loki data directory",
+      "sizeRecommendation": "50Gi"
+    }
+  ],
+  "healthCheck": {
+    "test": ["CMD-SHELL", "wget --spider -q http://localhost:3100/ready"],
+    "interval": 10000000000,
+    "timeout": 5000000000,
+    "retries": 3,
+    "startPeriod": 30000000000
+  },
+  "resources": {
+    "requests": {"cpu": "0.25", "memory": "256m"},
+    "limits": {"cpu": "1", "memory": "1g"},
+    "profiles": [
+      {"name": "small", "label": "Small", "requests": {"cpu": "0.25", "memory": "256m"}, "limits": {"cpu": "0.5", "memory": "512m"}},
+      {"name": "medium", "label": "Medium", "requests": {"cpu": "0.5", "memory": "512m"}, "limits": {"cpu": "1", "memory": "1g"}},
+      {"name": "large", "label": "Large", "requests": {"cpu": "1", "memory": "1g"}, "limits": {"cpu": "2", "memory": "2g"}}
+    ]
+  },
+  "documentation": {
+    "officialDocs": "https://grafana.com/docs/loki/",
+    "dockerHub": "https://hub.docker.com/r/grafana/loki",
+    "github": "https://github.com/grafana/loki",
+    "quickStart": "Loki exposes API at port 3100. Configure Promtail or agents to send logs."
+  },
+  "metadata": {
+    "author": "Uni-Deploy",
+    "license": "AGPL-3.0",
+    "createdAt": "2025-01-19T00:00:00Z",
+    "updatedAt": "2025-01-19T00:00:00Z"
+  }
+}

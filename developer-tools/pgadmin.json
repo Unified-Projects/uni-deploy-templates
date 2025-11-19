@@ -1,0 +1,105 @@
+{
+  "id": "pgadmin",
+  "name": "pgadmin",
+  "displayName": "pgAdmin",
+  "description": "PostgreSQL administration and development platform",
+  "longDescription": "pgAdmin is the most popular and feature rich Open Source administration and development platform for PostgreSQL.",
+  "category": "developer-tools",
+  "tags": ["database", "postgresql", "admin", "gui"],
+  "icon": {
+    "type": "url",
+    "value": "https://www.pgadmin.org/static/COMPILED/assets/img/logo-right-128.png",
+    "color": "#336791"
+  },
+  "version": "1.0.0",
+  "image": "dpage/pgadmin4",
+  "imageTag": "latest",
+  "imageTags": [
+    {"tag": "latest", "label": "pgAdmin 4 (Latest)", "recommended": true}
+  ],
+  "replication": {
+    "canReplicate": true,
+    "defaultReplicas": 1,
+    "maxReplicas": 3,
+    "recommendations": "Can be replicated with shared session storage"
+  },
+  "updateStrategy": {
+    "type": "rolling",
+    "rollingUpdate": {"maxUnavailable": 0, "maxSurge": 1}
+  },
+  "requiredVariables": [
+    {
+      "key": "PGADMIN_DEFAULT_EMAIL",
+      "description": "Default admin email for login",
+      "required": true,
+      "validation": {"pattern": "^[^@]+@[^@]+\\.[^@]+$"},
+      "placeholder": "admin@example.com"
+    },
+    {
+      "key": "PGADMIN_DEFAULT_PASSWORD",
+      "description": "Default admin password",
+      "required": true,
+      "secret": true,
+      "validation": {"minLength": 8}
+    }
+  ],
+  "optionalVariables": [],
+  "exposedVariables": [
+    {
+      "key": "PGADMIN_URL",
+      "description": "pgAdmin web UI URL",
+      "formula": "http://${service_name}:${port}",
+      "dependencies": [],
+      "example": "http://pgadmin:80"
+    },
+    {
+      "key": "PGADMIN_HOST",
+      "description": "pgAdmin hostname",
+      "formula": "${service_name}",
+      "dependencies": []
+    },
+    {
+      "key": "PGADMIN_PORT",
+      "description": "pgAdmin web port",
+      "formula": "${port}",
+      "dependencies": []
+    }
+  ],
+  "ports": [
+    {"name": "http", "containerPort": 80, "protocol": "tcp", "expose": true, "description": "Web UI"}
+  ],
+  "volumes": [
+    {
+      "name": "pgadmin-data",
+      "mountPath": "/var/lib/pgadmin",
+      "description": "pgAdmin data directory",
+      "sizeRecommendation": "1Gi"
+    }
+  ],
+  "healthCheck": {
+    "test": ["CMD-SHELL", "wget --spider -q http://localhost:80/misc/ping"],
+    "interval": 10000000000,
+    "timeout": 5000000000,
+    "retries": 3,
+    "startPeriod": 30000000000
+  },
+  "resources": {
+    "requests": {"cpu": "0.1", "memory": "128m"},
+    "limits": {"cpu": "0.5", "memory": "512m"},
+    "profiles": [
+      {"name": "small", "label": "Small", "requests": {"cpu": "0.1", "memory": "128m"}, "limits": {"cpu": "0.25", "memory": "256m"}},
+      {"name": "medium", "label": "Medium", "requests": {"cpu": "0.25", "memory": "256m"}, "limits": {"cpu": "0.5", "memory": "512m"}}
+    ]
+  },
+  "documentation": {
+    "officialDocs": "https://www.pgadmin.org/docs/",
+    "dockerHub": "https://hub.docker.com/r/dpage/pgadmin4",
+    "quickStart": "Access at http://localhost:80. Login with configured email and password."
+  },
+  "metadata": {
+    "author": "Uni-Deploy",
+    "license": "PostgreSQL License",
+    "createdAt": "2025-01-19T00:00:00Z",
+    "updatedAt": "2025-01-19T00:00:00Z"
+  }
+}

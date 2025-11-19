@@ -1,0 +1,91 @@
+{
+  "id": "keydb",
+  "name": "keydb",
+  "displayName": "KeyDB",
+  "description": "High-performance fork of Redis with multithreading",
+  "longDescription": "KeyDB is a high performance fork of Redis with a focus on multithreading, memory efficiency, and high throughput. It is fully compatible with Redis.",
+  "category": "cache",
+  "tags": ["cache", "key-value", "redis-compatible", "multithreading"],
+  "icon": {
+    "type": "url",
+    "value": "https://docs.keydb.dev/img/logo.svg",
+    "color": "#DC382D"
+  },
+  "version": "1.0.0",
+  "image": "eqalpha/keydb",
+  "imageTag": "alpine",
+  "imageTags": [
+    {"tag": "alpine", "label": "KeyDB (Alpine)", "recommended": true}
+  ],
+  "replication": {
+    "canReplicate": true,
+    "defaultReplicas": 1,
+    "maxReplicas": 5,
+    "recommendations": "KeyDB supports active-active replication"
+  },
+  "updateStrategy": {
+    "type": "rolling",
+    "rollingUpdate": {"maxUnavailable": 0, "maxSurge": 1}
+  },
+  "requiredVariables": [],
+  "optionalVariables": [
+    {
+      "key": "KEYDB_PASSWORD",
+      "description": "Password for KeyDB authentication",
+      "required": false,
+      "secret": true,
+      "helpText": "Highly recommended for production"
+    }
+  ],
+  "exposedVariables": [
+    {
+      "key": "KEYDB_URL",
+      "description": "KeyDB connection string",
+      "formula": "redis://:${KEYDB_PASSWORD}@${service_name}:${port}",
+      "dependencies": ["KEYDB_PASSWORD"],
+      "secret": true
+    },
+    {
+      "key": "KEYDB_HOST",
+      "description": "KeyDB hostname",
+      "formula": "${service_name}",
+      "dependencies": []
+    },
+    {
+      "key": "KEYDB_PORT",
+      "description": "KeyDB port",
+      "formula": "${port}",
+      "dependencies": []
+    }
+  ],
+  "ports": [
+    {"name": "keydb", "containerPort": 6379, "protocol": "tcp"}
+  ],
+  "healthCheck": {
+    "test": ["CMD", "keydb-cli", "ping"],
+    "interval": 10000000000,
+    "timeout": 3000000000,
+    "retries": 3,
+    "startPeriod": 10000000000
+  },
+  "resources": {
+    "requests": {"cpu": "0.25", "memory": "128m"},
+    "limits": {"cpu": "2", "memory": "1g"},
+    "profiles": [
+      {"name": "small", "label": "Small", "requests": {"cpu": "0.1", "memory": "128m"}, "limits": {"cpu": "0.5", "memory": "256m"}},
+      {"name": "medium", "label": "Medium", "requests": {"cpu": "0.25", "memory": "256m"}, "limits": {"cpu": "1", "memory": "512m"}},
+      {"name": "large", "label": "Large", "requests": {"cpu": "0.5", "memory": "512m"}, "limits": {"cpu": "2", "memory": "1g"}}
+    ]
+  },
+  "documentation": {
+    "officialDocs": "https://docs.keydb.dev/",
+    "dockerHub": "https://hub.docker.com/r/eqalpha/keydb",
+    "github": "https://github.com/Snapchat/KeyDB"
+  },
+  "metadata": {
+    "author": "Uni-Deploy",
+    "license": "BSD",
+    "createdAt": "2025-01-19T00:00:00Z",
+    "updatedAt": "2025-01-19T00:00:00Z"
+  }
+}

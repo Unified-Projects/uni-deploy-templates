@@ -1,0 +1,136 @@
+{
+  "id": "kafka",
+  "name": "kafka",
+  "displayName": "Apache Kafka",
+  "description": "Distributed event streaming platform",
+  "longDescription": "Apache Kafka is an open-source distributed event streaming platform used for high-performance data pipelines, streaming analytics, data integration, and mission-critical applications.",
+  "category": "message-queue",
+  "tags": ["message-queue", "event-streaming", "distributed", "pub-sub"],
+  "icon": {
+    "type": "simpleicons",
+    "value": "apachekafka",
+    "color": "#231F20"
+  },
+  "version": "1.0.0",
+  "image": "confluentinc/cp-kafka",
+  "imageTag": "7.5.0",
+  "imageTags": [
+    {"tag": "7.5.0", "label": "Kafka 3.5 (Confluent 7.5)", "recommended": true},
+    {"tag": "7.4.0", "label": "Kafka 3.4 (Confluent 7.4)"}
+  ],
+  "replication": {
+    "canReplicate": true,
+    "defaultReplicas": 3,
+    "minReplicas": 1,
+    "maxReplicas": 100,
+    "warnings": ["Single-node Kafka is for development only", "Production requires at least 3 brokers and ZooKeeper/KRaft"],
+    "recommendations": "Deploy 3+ brokers with proper replication factor"
+  },
+  "updateStrategy": {
+    "type": "rolling",
+    "rollingUpdate": {"maxUnavailable": 1, "maxSurge": 0, "delay": 30}
+  },
+  "requiredVariables": [
+    {
+      "key": "KAFKA_BROKER_ID",
+      "description": "Unique broker ID",
+      "required": true,
+      "default": "1"
+    },
+    {
+      "key": "KAFKA_ZOOKEEPER_CONNECT",
+      "description": "ZooKeeper connection string",
+      "required": true,
+      "placeholder": "zookeeper:2181",
+      "helpText": "Required for Kafka < 3.3, or use KRaft mode"
+    }
+  ],
+  "optionalVariables": [
+    {
+      "key": "KAFKA_ADVERTISED_LISTENERS",
+      "description": "Advertised listeners for client connections",
+      "default": "PLAINTEXT://localhost:9092",
+      "required": false
+    },
+    {
+      "key": "KAFKA_LISTENER_SECURITY_PROTOCOL_MAP",
+      "description": "Listener security protocol mapping",
+      "default": "PLAINTEXT:PLAINTEXT",
+      "required": false
+    },
+    {
+      "key": "KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR",
+      "description": "Replication factor for offsets topic",
+      "default": "1",
+      "required": false
+    }
+  ],
+  "exposedVariables": [
+    {
+      "key": "KAFKA_BOOTSTRAP_SERVERS",
+      "description": "Kafka bootstrap servers",
+      "formula": "${service_name}:${port}",
+      "dependencies": [],
+      "example": "kafka:9092"
+    },
+    {
+      "key": "KAFKA_HOST",
+      "description": "Kafka broker hostname",
+      "formula": "${service_name}",
+      "dependencies": []
+    },
+    {
+      "key": "KAFKA_PORT",
+      "description": "Kafka broker port",
+      "formula": "${port}",
+      "dependencies": []
+    }
+  ],
+  "ports": [
+    {"name": "kafka", "containerPort": 9092, "protocol": "tcp", "description": "Kafka broker port"}
+  ],
+  "volumes": [
+    {
+      "name": "kafka-data",
+      "mountPath": "/var/lib/kafka/data",
+      "description": "Kafka data directory",
+      "sizeRecommendation": "100Gi"
+    }
+  ],
+  "healthCheck": {
+    "test": ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:9092"],
+    "interval": 10000000000,
+    "timeout": 10000000000,
+    "retries": 3,
+    "startPeriod": 60000000000
+  },
+  "resources": {
+    "requests": {"cpu": "0.5", "memory": "1g"},
+    "limits": {"cpu": "4", "memory": "4g"},
+    "profiles": [
+      {"name": "small", "label": "Small (Dev)", "requests": {"cpu": "0.25", "memory": "512m"}, "limits": {"cpu": "1", "memory": "1g"}},
+      {"name": "medium", "label": "Medium", "requests": {"cpu": "0.5", "memory": "1g"}, "limits": {"cpu": "2", "memory": "2g"}},
+      {"name": "large", "label": "Large (Production)", "requests": {"cpu": "1", "memory": "2g"}, "limits": {"cpu": "4", "memory": "4g"}},
+      {"name": "xlarge", "label": "Extra Large", "requests": {"cpu": "2", "memory": "4g"}, "limits": {"cpu": "8", "memory": "8g"}}
+    ]
+  },
+  "dependencies": [
+    {
+      "templateId": "zookeeper",
+      "optional": false,
+      "description": "Kafka requires ZooKeeper for coordination (unless using KRaft mode)"
+    }
+  ],
+  "documentation": {
+    "officialDocs": "https://kafka.apache.org/documentation/",
+    "dockerHub": "https://hub.docker.com/r/confluentinc/cp-kafka",
+    "github": "https://github.com/apache/kafka",
+    "quickStart": "Requires ZooKeeper. Set KAFKA_ZOOKEEPER_CONNECT to ZooKeeper address."
+  },
+  "metadata": {
+    "author": "Uni-Deploy",
+    "license": "Apache 2.0",
+    "createdAt": "2025-01-19T00:00:00Z",
+    "updatedAt": "2025-01-19T00:00:00Z"
+  }
+}

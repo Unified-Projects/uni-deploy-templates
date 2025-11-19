@@ -1,0 +1,103 @@
+{
+  "id": "nats",
+  "name": "nats",
+  "displayName": "NATS",
+  "description": "Cloud-native messaging system",
+  "longDescription": "NATS is a simple, secure and high performance open source messaging system for cloud native applications, IoT messaging, and microservices architectures.",
+  "category": "message-queue",
+  "tags": ["message-queue", "cloud-native", "microservices", "pub-sub"],
+  "icon": {
+    "type": "url",
+    "value": "https://nats.io/img/logos/nats-icon-color.svg",
+    "color": "#27AAE1"
+  },
+  "version": "1.0.0",
+  "image": "nats",
+  "imageTag": "alpine",
+  "imageTags": [
+    {"tag": "alpine", "label": "NATS (Alpine)", "recommended": true},
+    {"tag": "latest", "label": "NATS (Latest)"}
+  ],
+  "replication": {
+    "canReplicate": true,
+    "defaultReplicas": 3,
+    "minReplicas": 1,
+    "maxReplicas": 100,
+    "recommendations": "NATS clustering is straightforward and recommended for production"
+  },
+  "updateStrategy": {
+    "type": "rolling",
+    "rollingUpdate": {"maxUnavailable": 1, "maxSurge": 0}
+  },
+  "requiredVariables": [],
+  "optionalVariables": [
+    {
+      "key": "NATS_USER",
+      "description": "NATS username for authentication",
+      "required": false
+    },
+    {
+      "key": "NATS_PASSWORD",
+      "description": "NATS password for authentication",
+      "required": false,
+      "secret": true
+    }
+  ],
+  "exposedVariables": [
+    {
+      "key": "NATS_URL",
+      "description": "NATS connection URL",
+      "formula": "nats://${NATS_USER}:${NATS_PASSWORD}@${service_name}:${port}",
+      "dependencies": ["NATS_USER", "NATS_PASSWORD"],
+      "secret": true,
+      "example": "nats://user:pass@nats:4222"
+    },
+    {
+      "key": "NATS_HOST",
+      "description": "NATS hostname",
+      "formula": "${service_name}",
+      "dependencies": [],
+      "example": "nats"
+    },
+    {
+      "key": "NATS_PORT",
+      "description": "NATS client port",
+      "formula": "${port}",
+      "dependencies": [],
+      "example": "4222"
+    }
+  ],
+  "ports": [
+    {"name": "client", "containerPort": 4222, "protocol": "tcp", "description": "Client connections"},
+    {"name": "cluster", "containerPort": 6222, "protocol": "tcp", "description": "Cluster routes"},
+    {"name": "http", "containerPort": 8222, "protocol": "tcp", "expose": true, "description": "HTTP monitoring"}
+  ],
+  "healthCheck": {
+    "test": ["CMD", "nats-server", "-v"],
+    "interval": 10000000000,
+    "timeout": 3000000000,
+    "retries": 3,
+    "startPeriod": 10000000000
+  },
+  "resources": {
+    "requests": {"cpu": "0.1", "memory": "128m"},
+    "limits": {"cpu": "1", "memory": "512m"},
+    "profiles": [
+      {"name": "small", "label": "Small", "requests": {"cpu": "0.1", "memory": "128m"}, "limits": {"cpu": "0.25", "memory": "256m"}},
+      {"name": "medium", "label": "Medium", "requests": {"cpu": "0.25", "memory": "256m"}, "limits": {"cpu": "0.5", "memory": "512m"}},
+      {"name": "large", "label": "Large", "requests": {"cpu": "0.5", "memory": "512m"}, "limits": {"cpu": "1", "memory": "1g"}}
+    ]
+  },
+  "documentation": {
+    "officialDocs": "https://docs.nats.io/",
+    "dockerHub": "https://hub.docker.com/_/nats",
+    "github": "https://github.com/nats-io/nats-server",
+    "quickStart": "NATS works out of the box. Access monitoring UI at http://localhost:8222"
+  },
+  "metadata": {
+    "author": "Uni-Deploy",
+    "license": "Apache 2.0",
+    "createdAt": "2025-01-19T00:00:00Z",
+    "updatedAt": "2025-01-19T00:00:00Z"
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "id": "memcached",
+  "name": "memcached",
+  "displayName": "Memcached",
+  "description": "High-performance distributed memory caching system",
+  "longDescription": "Memcached is a free and open-source, high-performance, distributed memory object caching system. Generic in nature, but intended for use in speeding up dynamic web applications by alleviating database load.",
+  "category": "cache",
+  "tags": ["cache", "memory", "distributed"],
+  "icon": {
+    "type": "url",
+    "value": "https://cdn.worldvectorlogo.com/logos/memcached.svg",
+    "color": "#00ADD8"
+  },
+  "version": "1.0.0",
+  "image": "memcached",
+  "imageTag": "1.6-alpine",
+  "imageTags": [
+    {"tag": "1.6-alpine", "label": "Memcached 1.6 (Alpine)", "recommended": true},
+    {"tag": "1.5-alpine", "label": "Memcached 1.5 (Alpine)"}
+  ],
+  "replication": {
+    "canReplicate": true,
+    "defaultReplicas": 1,
+    "minReplicas": 1,
+    "maxReplicas": 10,
+    "recommendations": "Memcached is designed to be scaled horizontally"
+  },
+  "updateStrategy": {
+    "type": "rolling",
+    "rollingUpdate": {"maxUnavailable": 0, "maxSurge": 1}
+  },
+  "requiredVariables": [],
+  "optionalVariables": [
+    {
+      "key": "MEMCACHED_MAX_MEMORY",
+      "description": "Maximum memory in MB",
+      "default": "64",
+      "required": false
+    }
+  ],
+  "exposedVariables": [
+    {
+      "key": "MEMCACHED_HOST",
+      "description": "Memcached hostname",
+      "formula": "${service_name}",
+      "dependencies": [],
+      "example": "memcached"
+    },
+    {
+      "key": "MEMCACHED_PORT",
+      "description": "Memcached port",
+      "formula": "${port}",
+      "dependencies": [],
+      "example": "11211"
+    },
+    {
+      "key": "MEMCACHED_URL",
+      "description": "Memcached connection string",
+      "formula": "${service_name}:${port}",
+      "dependencies": [],
+      "example": "memcached:11211"
+    }
+  ],
+  "ports": [
+    {"name": "memcached", "containerPort": 11211, "protocol": "tcp"}
+  ],
+  "commands": ["memcached", "-m", "${MEMCACHED_MAX_MEMORY:-64}"],
+  "healthCheck": {
+    "test": ["CMD-SHELL", "echo stats | nc localhost 11211"],
+    "interval": 10000000000,
+    "timeout": 3000000000,
+    "retries": 3,
+    "startPeriod": 5000000000
+  },
+  "resources": {
+    "requests": {"cpu": "0.1", "memory": "64m"},
+    "limits": {"cpu": "0.5", "memory": "512m"},
+    "profiles": [
+      {"name": "small", "label": "Small", "requests": {"cpu": "0.1", "memory": "64m"}, "limits": {"cpu": "0.25", "memory": "128m"}},
+      {"name": "medium", "label": "Medium", "requests": {"cpu": "0.25", "memory": "128m"}, "limits": {"cpu": "0.5", "memory": "256m"}},
+      {"name": "large", "label": "Large", "requests": {"cpu": "0.5", "memory": "256m"}, "limits": {"cpu": "1", "memory": "512m"}}
+    ]
+  },
+  "documentation": {
+    "officialDocs": "https://memcached.org/",
+    "dockerHub": "https://hub.docker.com/_/memcached",
+    "github": "https://github.com/memcached/memcached"
+  },
+  "metadata": {
+    "author": "Uni-Deploy",
+    "license": "BSD",
+    "createdAt": "2025-01-19T00:00:00Z",
+    "updatedAt": "2025-01-19T00:00:00Z"
+  }
+}

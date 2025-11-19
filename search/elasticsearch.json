@@ -1,0 +1,116 @@
+{
+  "id": "elasticsearch",
+  "name": "elasticsearch",
+  "displayName": "Elasticsearch",
+  "description": "Distributed search and analytics engine",
+  "longDescription": "Elasticsearch is a distributed, RESTful search and analytics engine capable of addressing a growing number of use cases. As the heart of the Elastic Stack, it centrally stores your data for lightning fast search, fine‑tuned relevancy, and powerful analytics.",
+  "category": "search",
+  "tags": ["search", "analytics", "full-text", "distributed"],
+  "icon": {
+    "type": "simpleicons",
+    "value": "elasticsearch",
+    "color": "#005571"
+  },
+  "version": "1.0.0",
+  "image": "elasticsearch",
+  "imageTag": "8.11.0",
+  "imageTags": [
+    {"tag": "8.11.0", "label": "Elasticsearch 8.11", "recommended": true},
+    {"tag": "7.17.15", "label": "Elasticsearch 7.17 (LTS)"}
+  ],
+  "replication": {
+    "canReplicate": true,
+    "defaultReplicas": 1,
+    "minReplicas": 1,
+    "maxReplicas": 100,
+    "warnings": ["Single-node mode disables many features", "Production requires cluster setup"],
+    "recommendations": "Deploy at least 3 nodes for production cluster"
+  },
+  "updateStrategy": {
+    "type": "rolling",
+    "rollingUpdate": {"maxUnavailable": 0, "maxSurge": 1, "delay": 30}
+  },
+  "requiredVariables": [],
+  "optionalVariables": [
+    {
+      "key": "discovery.type",
+      "description": "Discovery type (single-node for dev)",
+      "default": "single-node",
+      "required": false
+    },
+    {
+      "key": "xpack.security.enabled",
+      "description": "Enable security features",
+      "default": "false",
+      "required": false
+    },
+    {
+      "key": "ELASTIC_PASSWORD",
+      "description": "Password for elastic user (if security enabled)",
+      "required": false,
+      "secret": true
+    }
+  ],
+  "exposedVariables": [
+    {
+      "key": "ELASTICSEARCH_URL",
+      "description": "Elasticsearch HTTP API URL",
+      "formula": "http://${service_name}:${port}",
+      "dependencies": [],
+      "example": "http://elasticsearch:9200"
+    },
+    {
+      "key": "ELASTICSEARCH_HOST",
+      "description": "Elasticsearch hostname",
+      "formula": "${service_name}",
+      "dependencies": []
+    },
+    {
+      "key": "ELASTICSEARCH_PORT",
+      "description": "Elasticsearch HTTP port",
+      "formula": "${port}",
+      "dependencies": []
+    }
+  ],
+  "ports": [
+    {"name": "http", "containerPort": 9200, "protocol": "tcp", "expose": true, "description": "HTTP API"},
+    {"name": "transport", "containerPort": 9300, "protocol": "tcp", "description": "Internal transport"}
+  ],
+  "volumes": [
+    {
+      "name": "elasticsearch-data",
+      "mountPath": "/usr/share/elasticsearch/data",
+      "description": "Elasticsearch data directory",
+      "sizeRecommendation": "100Gi"
+    }
+  ],
+  "healthCheck": {
+    "test": ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"],
+    "interval": 10000000000,
+    "timeout": 5000000000,
+    "retries": 3,
+    "startPeriod": 60000000000
+  },
+  "resources": {
+    "requests": {"cpu": "1", "memory": "2g"},
+    "limits": {"cpu": "4", "memory": "4g"},
+    "profiles": [
+      {"name": "small", "label": "Small (Dev)", "requests": {"cpu": "0.5", "memory": "1g"}, "limits": {"cpu": "1", "memory": "2g"}},
+      {"name": "medium", "label": "Medium", "requests": {"cpu": "1", "memory": "2g"}, "limits": {"cpu": "2", "memory": "4g"}},
+      {"name": "large", "label": "Large (Production)", "requests": {"cpu": "2", "memory": "4g"}, "limits": {"cpu": "4", "memory": "8g"}},
+      {"name": "xlarge", "label": "Extra Large", "requests": {"cpu": "4", "memory": "8g"}, "limits": {"cpu": "8", "memory": "16g"}}
+    ]
+  },
+  "documentation": {
+    "officialDocs": "https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html",
+    "dockerHub": "https://hub.docker.com/_/elasticsearch",
+    "github": "https://github.com/elastic/elasticsearch",
+    "quickStart": "Access API at http://localhost:9200. Set discovery.type=single-node for development."
+  },
+  "metadata": {
+    "author": "Uni-Deploy",
+    "license": "Elastic License",
+    "createdAt": "2025-01-19T00:00:00Z",
+    "updatedAt": "2025-01-19T00:00:00Z"
+  }
+}

@@ -1,0 +1,140 @@
+{
+  "id": "minio",
+  "name": "minio",
+  "displayName": "MinIO",
+  "description": "High-performance S3-compatible object storage",
+  "longDescription": "MinIO is a high-performance, S3 compatible object store. It is built for large scale AI/ML, data lake and database workloads. It runs on-prem and on any cloud.",
+  "category": "storage",
+  "tags": ["storage", "object-storage", "s3-compatible", "distributed"],
+  "icon": {
+    "type": "simpleicons",
+    "value": "minio",
+    "color": "#C72E49"
+  },
+  "version": "1.0.0",
+  "image": "minio/minio",
+  "imageTag": "latest",
+  "imageTags": [
+    {"tag": "latest", "label": "MinIO (Latest)", "recommended": true}
+  ],
+  "replication": {
+    "canReplicate": true,
+    "defaultReplicas": 1,
+    "minReplicas": 1,
+    "maxReplicas": 16,
+    "warnings": ["Distributed mode requires at least 4 nodes"],
+    "recommendations": "Use distributed mode with 4+ nodes for production HA"
+  },
+  "updateStrategy": {
+    "type": "rolling",
+    "rollingUpdate": {"maxUnavailable": 0, "maxSurge": 1}
+  },
+  "requiredVariables": [
+    {
+      "key": "MINIO_ROOT_USER",
+      "description": "Root access key (username)",
+      "required": true,
+      "validation": {"minLength": 3}
+    },
+    {
+      "key": "MINIO_ROOT_PASSWORD",
+      "description": "Root secret key (password)",
+      "required": true,
+      "secret": true,
+      "validation": {"minLength": 8}
+    }
+  ],
+  "optionalVariables": [],
+  "exposedVariables": [
+    {
+      "key": "MINIO_ENDPOINT",
+      "description": "MinIO API endpoint",
+      "formula": "${service_name}:${port}",
+      "dependencies": [],
+      "example": "minio:9000"
+    },
+    {
+      "key": "MINIO_URL",
+      "description": "MinIO API URL",
+      "formula": "http://${service_name}:${port}",
+      "dependencies": [],
+      "example": "http://minio:9000"
+    },
+    {
+      "key": "MINIO_CONSOLE_URL",
+      "description": "MinIO Console URL",
+      "formula": "http://${service_name}:9001",
+      "dependencies": [],
+      "example": "http://minio:9001"
+    },
+    {
+      "key": "MINIO_HOST",
+      "description": "MinIO hostname",
+      "formula": "${service_name}",
+      "dependencies": []
+    },
+    {
+      "key": "MINIO_PORT",
+      "description": "MinIO API port",
+      "formula": "${port}",
+      "dependencies": []
+    },
+    {
+      "key": "MINIO_ROOT_USER",
+      "description": "MinIO root user",
+      "formula": "${MINIO_ROOT_USER}",
+      "dependencies": ["MINIO_ROOT_USER"],
+      "example": "minioadmin"
+    },
+    {
+      "key": "MINIO_ROOT_PASSWORD",
+      "description": "MinIO root password",
+      "formula": "${MINIO_ROOT_PASSWORD}",
+      "dependencies": ["MINIO_ROOT_PASSWORD"],
+      "secret": true,
+      "example": "minioadmin"
+    }
+  ],
+  "ports": [
+    {"name": "api", "containerPort": 9000, "protocol": "tcp", "expose": true, "description": "S3 API"},
+    {"name": "console", "containerPort": 9001, "protocol": "tcp", "expose": true, "description": "Web Console"}
+  ],
+  "commands": ["server", "/data", "--console-address", ":9001"],
+  "volumes": [
+    {
+      "name": "minio-data",
+      "mountPath": "/data",
+      "description": "MinIO data directory",
+      "sizeRecommendation": "100Gi"
+    }
+  ],
+  "healthCheck": {
+    "test": ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"],
+    "interval": 10000000000,
+    "timeout": 5000000000,
+    "retries": 3,
+    "startPeriod": 10000000000
+  },
+  "resources": {
+    "requests": {"cpu": "0.5", "memory": "512m"},
+    "limits": {"cpu": "2", "memory": "2g"},
+    "profiles": [
+      {"name": "small", "label": "Small", "requests": {"cpu": "0.25", "memory": "256m"}, "limits": {"cpu": "0.5", "memory": "512m"}},
+      {"name": "medium", "label": "Medium", "requests": {"cpu": "0.5", "memory": "512m"}, "limits": {"cpu": "1", "memory": "1g"}},
+      {"name": "large", "label": "Large", "requests": {"cpu": "1", "memory": "1g"}, "limits": {"cpu": "2", "memory": "2g"}},
+      {"name": "xlarge", "label": "Extra Large", "requests": {"cpu": "2", "memory": "2g"}, "limits": {"cpu": "4", "memory": "4g"}}
+    ]
+  },
+  "documentation": {
+    "officialDocs": "https://min.io/docs/minio/linux/index.html",
+    "dockerHub": "https://hub.docker.com/r/minio/minio",
+    "github": "https://github.com/minio/minio",
+    "quickStart": "Access console at http://localhost:9001. API at http://localhost:9000."
+  },
+  "metadata": {
+    "author": "Uni-Deploy",
+    "license": "AGPL-3.0",
+    "createdAt": "2025-01-19T00:00:00Z",
+    "updatedAt": "2025-01-19T00:00:00Z"
+  }
+}

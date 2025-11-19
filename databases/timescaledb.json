@@ -1,0 +1,110 @@
+{
+  "id": "timescaledb",
+  "name": "timescaledb",
+  "displayName": "TimescaleDB",
+  "description": "Time-series database built on PostgreSQL",
+  "longDescription": "TimescaleDB is an open-source time-series SQL database optimized for fast ingest and complex queries. Packaged as a PostgreSQL extension.",
+  "category": "database",
+  "tags": ["database", "timeseries", "postgresql", "sql"],
+  "icon": {
+    "type": "url",
+    "value": "https://www.timescale.com/static/timescale-logo.svg",
+    "color": "#FDB515"
+  },
+  "version": "1.0.0",
+  "image": "timescale/timescaledb",
+  "imageTag": "latest-pg16",
+  "imageTags": [
+    {"tag": "latest-pg16", "label": "TimescaleDB with PostgreSQL 16", "recommended": true},
+    {"tag": "latest-pg15", "label": "TimescaleDB with PostgreSQL 15"}
+  ],
+  "replication": {
+    "canReplicate": false,
+    "defaultReplicas": 1,
+    "warnings": ["TimescaleDB requires PostgreSQL streaming replication for HA"],
+    "recommendations": "Use managed TimescaleDB or configure PostgreSQL replication"
+  },
+  "updateStrategy": {"type": "recreate"},
+  "requiredVariables": [
+    {
+      "key": "POSTGRES_PASSWORD",
+      "description": "Password for PostgreSQL superuser",
+      "required": true,
+      "secret": true,
+      "validation": {"minLength": 8}
+    }
+  ],
+  "optionalVariables": [
+    {
+      "key": "POSTGRES_USER",
+      "description": "PostgreSQL superuser name",
+      "default": "postgres",
+      "required": false
+    },
+    {
+      "key": "POSTGRES_DB",
+      "description": "Default database to create",
+      "default": "postgres",
+      "required": false
+    }
+  ],
+  "exposedVariables": [
+    {
+      "key": "DATABASE_URL",
+      "description": "PostgreSQL connection string with TimescaleDB",
+      "formula": "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${service_name}:${port}/${POSTGRES_DB}",
+      "dependencies": ["POSTGRES_USER", "POSTGRES_PASSWORD", "POSTGRES_DB"],
+      "secret": true
+    },
+    {
+      "key": "TIMESCALEDB_HOST",
+      "description": "TimescaleDB hostname",
+      "formula": "${service_name}",
+      "dependencies": []
+    },
+    {
+      "key": "TIMESCALEDB_PORT",
+      "description": "TimescaleDB port",
+      "formula": "${port}",
+      "dependencies": []
+    }
+  ],
+  "ports": [
+    {"name": "postgresql", "containerPort": 5432, "protocol": "tcp"}
+  ],
+  "volumes": [
+    {
+      "name": "timescaledb-data",
+      "mountPath": "/var/lib/postgresql/data",
+      "description": "TimescaleDB data directory",
+      "sizeRecommendation": "50Gi"
+    }
+  ],
+  "healthCheck": {
+    "test": ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"],
+    "interval": 10000000000,
+    "timeout": 3000000000,
+    "retries": 3,
+    "startPeriod": 30000000000
+  },
+  "resources": {
+    "requests": {"cpu": "0.5", "memory": "512m"},
+    "limits": {"cpu": "4", "memory": "4g"},
+    "profiles": [
+      {"name": "small", "label": "Small", "requests": {"cpu": "0.25", "memory": "512m"}, "limits": {"cpu": "1", "memory": "1g"}},
+      {"name": "medium", "label": "Medium", "requests": {"cpu": "0.5", "memory": "1g"}, "limits": {"cpu": "2", "memory": "2g"}},
+      {"name": "large", "label": "Large", "requests": {"cpu": "1", "memory": "2g"}, "limits": {"cpu": "4", "memory": "4g"}}
+    ]
+  },
+  "documentation": {
+    "officialDocs": "https://docs.timescale.com/",
+    "dockerHub": "https://hub.docker.com/r/timescale/timescaledb",
+    "github": "https://github.com/timescale/timescaledb"
+  },
+  "metadata": {
+    "author": "Uni-Deploy",
+    "license": "Apache 2.0",
+    "createdAt": "2025-01-19T00:00:00Z",
+    "updatedAt": "2025-01-19T00:00:00Z"
+  }
+}

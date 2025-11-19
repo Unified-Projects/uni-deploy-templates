@@ -1,0 +1,90 @@
+{
+  "id": "dragonfly",
+  "name": "dragonfly",
+  "displayName": "Dragonfly",
+  "description": "Modern in-memory datastore, Redis/Memcached alternative",
+  "longDescription": "Dragonfly is a modern in-memory datastore, fully compatible with Redis and Memcached APIs. Built for performance and efficiency with vertical scaling.",
+  "category": "cache",
+  "tags": ["cache", "key-value", "redis-compatible", "modern"],
+  "icon": {
+    "type": "url",
+    "value": "https://www.dragonflydb.io/logo.svg",
+    "color": "#FF6B6B"
+  },
+  "version": "1.0.0",
+  "image": "docker.dragonflydb.io/dragonflydb/dragonfly",
+  "imageTag": "latest",
+  "imageTags": [
+    {"tag": "latest", "label": "Dragonfly (Latest)", "recommended": true}
+  ],
+  "replication": {
+    "canReplicate": true,
+    "defaultReplicas": 1,
+    "maxReplicas": 3,
+    "recommendations": "Dragonfly supports master-replica replication"
+  },
+  "updateStrategy": {
+    "type": "rolling",
+    "rollingUpdate": {"maxUnavailable": 0, "maxSurge": 1}
+  },
+  "requiredVariables": [],
+  "optionalVariables": [
+    {
+      "key": "DRAGONFLY_PASSWORD",
+      "description": "Password for Dragonfly authentication",
+      "required": false,
+      "secret": true
+    }
+  ],
+  "exposedVariables": [
+    {
+      "key": "DRAGONFLY_URL",
+      "description": "Dragonfly connection string (Redis protocol)",
+      "formula": "redis://:${DRAGONFLY_PASSWORD}@${service_name}:${port}",
+      "dependencies": ["DRAGONFLY_PASSWORD"],
+      "secret": true
+    },
+    {
+      "key": "DRAGONFLY_HOST",
+      "description": "Dragonfly hostname",
+      "formula": "${service_name}",
+      "dependencies": []
+    },
+    {
+      "key": "DRAGONFLY_PORT",
+      "description": "Dragonfly port",
+      "formula": "${port}",
+      "dependencies": []
+    }
+  ],
+  "ports": [
+    {"name": "dragonfly", "containerPort": 6379, "protocol": "tcp"}
+  ],
+  "healthCheck": {
+    "test": ["CMD", "redis-cli", "ping"],
+    "interval": 10000000000,
+    "timeout": 3000000000,
+    "retries": 3,
+    "startPeriod": 10000000000
+  },
+  "resources": {
+    "requests": {"cpu": "0.25", "memory": "256m"},
+    "limits": {"cpu": "2", "memory": "2g"},
+    "profiles": [
+      {"name": "small", "label": "Small", "requests": {"cpu": "0.25", "memory": "256m"}, "limits": {"cpu": "0.5", "memory": "512m"}},
+      {"name": "medium", "label": "Medium", "requests": {"cpu": "0.5", "memory": "512m"}, "limits": {"cpu": "1", "memory": "1g"}},
+      {"name": "large", "label": "Large", "requests": {"cpu": "1", "memory": "1g"}, "limits": {"cpu": "2", "memory": "2g"}}
+    ]
+  },
+  "documentation": {
+    "officialDocs": "https://www.dragonflydb.io/docs",
+    "dockerHub": "https://hub.docker.com/r/dragonflydb/dragonfly",
+    "github": "https://github.com/dragonflydb/dragonfly"
+  },
+  "metadata": {
+    "author": "Uni-Deploy",
+    "license": "BSL",
+    "createdAt": "2025-01-19T00:00:00Z",
+    "updatedAt": "2025-01-19T00:00:00Z"
+  }
+}

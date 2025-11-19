@@ -1,0 +1,94 @@
+{
+  "id": "prometheus",
+  "name": "prometheus",
+  "displayName": "Prometheus",
+  "description": "Monitoring system and time series database",
+  "longDescription": "Prometheus is an open-source systems monitoring and alerting toolkit. It collects and stores metrics as time series data with labels for flexible querying.",
+  "category": "monitoring",
+  "tags": ["monitoring", "metrics", "time-series", "alerting"],
+  "icon": {
+    "type": "simpleicons",
+    "value": "prometheus",
+    "color": "#E6522C"
+  },
+  "version": "1.0.0",
+  "image": "prom/prometheus",
+  "imageTag": "latest",
+  "imageTags": [
+    {"tag": "latest", "label": "Prometheus (Latest)", "recommended": true},
+    {"tag": "v2.48.0", "label": "Prometheus 2.48"}
+  ],
+  "replication": {
+    "canReplicate": true,
+    "defaultReplicas": 1,
+    "maxReplicas": 2,
+    "warnings": ["Multiple Prometheus instances will scrape independently"],
+    "recommendations": "Use federation or Thanos for HA setups"
+  },
+  "updateStrategy": {
+    "type": "rolling",
+    "rollingUpdate": {"maxUnavailable": 0, "maxSurge": 1}
+  },
+  "requiredVariables": [],
+  "optionalVariables": [],
+  "exposedVariables": [
+    {
+      "key": "PROMETHEUS_URL",
+      "description": "Prometheus HTTP API URL",
+      "formula": "http://${service_name}:${port}",
+      "dependencies": [],
+      "example": "http://prometheus:9090"
+    },
+    {
+      "key": "PROMETHEUS_HOST",
+      "description": "Prometheus hostname",
+      "formula": "${service_name}",
+      "dependencies": []
+    },
+    {
+      "key": "PROMETHEUS_PORT",
+      "description": "Prometheus web port",
+      "formula": "${port}",
+      "dependencies": []
+    }
+  ],
+  "ports": [
+    {"name": "http", "containerPort": 9090, "protocol": "tcp", "expose": true, "description": "Web UI and API"}
+  ],
+  "volumes": [
+    {
+      "name": "prometheus-data",
+      "mountPath": "/prometheus",
+      "description": "Prometheus data directory",
+      "sizeRecommendation": "50Gi"
+    }
+  ],
+  "healthCheck": {
+    "test": ["CMD", "wget", "--spider", "-q", "http://localhost:9090/-/healthy"],
+    "interval": 10000000000,
+    "timeout": 5000000000,
+    "retries": 3,
+    "startPeriod": 30000000000
+  },
+  "resources": {
+    "requests": {"cpu": "0.25", "memory": "512m"},
+    "limits": {"cpu": "2", "memory": "2g"},
+    "profiles": [
+      {"name": "small", "label": "Small", "requests": {"cpu": "0.25", "memory": "512m"}, "limits": {"cpu": "0.5", "memory": "1g"}},
+      {"name": "medium", "label": "Medium", "requests": {"cpu": "0.5", "memory": "1g"}, "limits": {"cpu": "1", "memory": "2g"}},
+      {"name": "large", "label": "Large", "requests": {"cpu": "1", "memory": "2g"}, "limits": {"cpu": "2", "memory": "4g"}}
+    ]
+  },
+  "documentation": {
+    "officialDocs": "https://prometheus.io/docs/",
+    "dockerHub": "https://hub.docker.com/r/prom/prometheus",
+    "github": "https://github.com/prometheus/prometheus",
+    "quickStart": "Access UI at http://localhost:9090. Configure scrape targets via configuration."
+  },
+  "metadata": {
+    "author": "Uni-Deploy",
+    "license": "Apache 2.0",
+    "createdAt": "2025-01-19T00:00:00Z",
+    "updatedAt": "2025-01-19T00:00:00Z"
+  }
+}
