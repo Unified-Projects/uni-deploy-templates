@@ -7,8 +7,8 @@
   "category": "web-server",
   "tags": ["web-server", "reverse-proxy", "https", "automatic-tls"],
   "icon": {
-    "type": "url",
-    "value": "https://caddyserver.com/resources/images/caddy-circle-lock.svg",
+    "type": "simpleicons",
+    "value": "caddy",
     "color": "#1F88C0"
   },
   "version": "1.0.0",

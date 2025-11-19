@@ -7,8 +7,8 @@
   "category": "cache",
   "tags": ["cache", "key-value", "redis-compatible", "modern"],
   "icon": {
-    "type": "url",
-    "value": "https://www.dragonflydb.io/logo.svg",
+    "type": "lucide",
+    "value": "database",
     "color": "#FF6B6B"
   },
   "version": "1.0.0",

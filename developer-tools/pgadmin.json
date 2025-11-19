@@ -7,8 +7,8 @@
   "category": "developer-tools",
   "tags": ["database", "postgresql", "admin", "gui"],
   "icon": {
-    "type": "url",
-    "value": "https://www.pgadmin.org/static/COMPILED/assets/img/logo-right-128.png",
+    "type": "simpleicons",
+    "value": "postgresql",
     "color": "#336791"
   },
   "version": "1.0.0",

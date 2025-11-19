@@ -7,8 +7,8 @@
   "category": "monitoring",
   "tags": ["monitoring", "tracing", "distributed", "observability"],
   "icon": {
-    "type": "url",
-    "value": "https://www.jaegertracing.io/img/jaeger-icon-color.svg",
+    "type": "lucide",
+    "value": "activity",
     "color": "#60D0E4"
   },
   "version": "1.0.0",

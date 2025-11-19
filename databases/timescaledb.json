@@ -7,8 +7,8 @@
   "category": "database",
   "tags": ["database", "timeseries", "postgresql", "sql"],
   "icon": {
-    "type": "url",
-    "value": "https://www.timescale.com/static/timescale-logo.svg",
+    "type": "simpleicons",
+    "value": "timescale",
     "color": "#FDB515"
   },
   "version": "1.0.0",
