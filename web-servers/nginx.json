@@ -1,0 +1,79 @@
+{
+  "id": "nginx",
+  "name": "nginx",
+  "displayName": "Nginx",
+  "description": "High-performance web server and reverse proxy",
+  "longDescription": "Nginx is a web server that can also be used as a reverse proxy, load balancer, mail proxy and HTTP cache. Known for its high performance, stability, rich feature set, simple configuration, and low resource consumption.",
+  "category": "web-server",
+  "tags": ["web-server", "reverse-proxy", "load-balancer", "nginx"],
+  "icon": {
+    "type": "simpleicons",
+    "value": "nginx",
+    "color": "#009639"
+  },
+  "version": "1.0.0",
+  "image": "nginx",
+  "imageTag": "alpine",
+  "imageTags": [
+    {"tag": "alpine", "label": "Nginx (Alpine)", "recommended": true},
+    {"tag": "latest", "label": "Nginx (Latest)"}
+  ],
+  "replication": {
+    "canReplicate": true,
+    "defaultReplicas": 1,
+    "minReplicas": 1,
+    "maxReplicas": 10,
+    "recommendations": "Nginx is stateless and can be safely replicated for load balancing"
+  },
+  "updateStrategy": {
+    "type": "rolling",
+    "rollingUpdate": {
+      "maxUnavailable": 0,
+      "maxSurge": 1,
+      "delay": 5
+    }
+  },
+  "requiredVariables": [],
+  "optionalVariables": [],
+  "exposedVariables": [
+    {
+      "key": "NGINX_HOST",
+      "description": "Nginx service hostname",
+      "formula": "${service_name}",
+      "dependencies": []
+    },
+    {
+      "key": "NGINX_PORT",
+      "description": "Nginx service port",
+      "formula": "${port}",
+      "dependencies": []
+    }
+  ],
+  "ports": [{"name": "http", "containerPort": 80, "protocol": "tcp", "expose": true}],
+  "healthCheck": {
+    "test": ["CMD-SHELL", "curl -f http://localhost/ || exit 1"],
+    "interval": 10000000000,
+    "timeout": 3000000000,
+    "retries": 3,
+    "startPeriod": 10000000000
+  },
+  "resources": {
+    "requests": {"cpu": "0.1", "memory": "64m"},
+    "limits": {"cpu": "0.5", "memory": "256m"},
+    "profiles": [
+      {"name": "small", "label": "Small", "requests": {"cpu": "0.1", "memory": "64m"}, "limits": {"cpu": "0.25", "memory": "128m"}},
+      {"name": "medium", "label": "Medium", "requests": {"cpu": "0.25", "memory": "128m"}, "limits": {"cpu": "0.5", "memory": "256m"}}
+    ]
+  },
+  "documentation": {
+    "officialDocs": "https://nginx.org/en/docs/",
+    "dockerHub": "https://hub.docker.com/_/nginx",
+    "github": "https://github.com/nginx/nginx"
+  },
+  "metadata": {
+    "author": "Uni-Deploy",
+    "license": "BSD",
+    "createdAt": "2025-01-19T00:00:00Z",
+    "updatedAt": "2025-01-19T00:00:00Z"
+  }
+}

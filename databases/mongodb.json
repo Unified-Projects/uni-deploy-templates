@@ -1,0 +1,181 @@
+{
+  "id": "mongodb",
+  "name": "mongodb",
+  "displayName": "MongoDB",
+  "description": "Document-oriented NoSQL database",
+  "longDescription": "MongoDB is a source-available cross-platform document-oriented database program. Classified as a NoSQL database, MongoDB uses JSON-like documents with optional schemas.",
+  "category": "database",
+  "tags": ["database", "nosql", "document", "mongodb"],
+  "icon": {
+    "type": "simpleicons",
+    "value": "mongodb",
+    "color": "#47A248"
+  },
+  "version": "1.0.0",
+  "image": "mongo",
+  "imageTag": "7",
+  "imageTags": [
+    {
+      "tag": "7",
+      "label": "MongoDB 7",
+      "description": "Latest stable release",
+      "recommended": true
+    },
+    {
+      "tag": "6",
+      "label": "MongoDB 6",
+      "description": "Previous major version"
+    }
+  ],
+  "replication": {
+    "canReplicate": false,
+    "defaultReplicas": 1,
+    "minReplicas": 1,
+    "maxReplicas": 1,
+    "warnings": [
+      "MongoDB requires replica set configuration for replication",
+      "Single-node deployments do not provide HA",
+      "Use MongoDB Atlas or configure replica sets manually for production"
+    ]
+  },
+  "updateStrategy": {
+    "type": "recreate",
+    "order": "stop-first"
+  },
+  "restartPolicy": "any",
+  "requiredVariables": [
+    {
+      "key": "MONGO_INITDB_ROOT_USERNAME",
+      "description": "MongoDB root username",
+      "required": true,
+      "validation": {
+        "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$"
+      }
+    },
+    {
+      "key": "MONGO_INITDB_ROOT_PASSWORD",
+      "description": "MongoDB root password",
+      "required": true,
+      "secret": true,
+      "validation": {
+        "minLength": 8
+      }
+    }
+  ],
+  "optionalVariables": [
+    {
+      "key": "MONGO_INITDB_DATABASE",
+      "description": "Default database to create",
+      "required": false,
+      "default": "admin",
+      "validation": {
+        "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$"
+      }
+    }
+  ],
+  "exposedVariables": [
+    {
+      "key": "MONGODB_URL",
+      "description": "Full MongoDB connection string",
+      "formula": "mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@${service_name}:${port}/${MONGO_INITDB_DATABASE}",
+      "dependencies": ["MONGO_INITDB_ROOT_USERNAME", "MONGO_INITDB_ROOT_PASSWORD", "MONGO_INITDB_DATABASE"],
+      "secret": true
+    },
+    {
+      "key": "MONGO_HOST",
+      "description": "MongoDB service hostname",
+      "formula": "${service_name}",
+      "dependencies": []
+    },
+    {
+      "key": "MONGO_PORT",
+      "description": "MongoDB service port",
+      "formula": "${port}",
+      "dependencies": []
+    },
+    {
+      "key": "MONGO_INITDB_ROOT_USERNAME",
+      "description": "MongoDB root username",
+      "formula": "${MONGO_INITDB_ROOT_USERNAME}",
+      "dependencies": ["MONGO_INITDB_ROOT_USERNAME"]
+    },
+    {
+      "key": "MONGO_INITDB_ROOT_PASSWORD",
+      "description": "MongoDB root password",
+      "formula": "${MONGO_INITDB_ROOT_PASSWORD}",
+      "dependencies": ["MONGO_INITDB_ROOT_PASSWORD"],
+      "secret": true
+    },
+    {
+      "key": "MONGO_INITDB_DATABASE",
+      "description": "MongoDB database name",
+      "formula": "${MONGO_INITDB_DATABASE}",
+      "dependencies": ["MONGO_INITDB_DATABASE"]
+    }
+  ],
+  "ports": [
+    {
+      "name": "mongodb",
+      "containerPort": 27017,
+      "protocol": "tcp",
+      "expose": false
+    }
+  ],
+  "volumes": [
+    {
+      "name": "mongodb-data",
+      "mountPath": "/data/db",
+      "description": "MongoDB data directory",
+      "sizeRecommendation": "20Gi"
+    }
+  ],
+  "healthCheck": {
+    "test": ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"],
+    "interval": 10000000000,
+    "timeout": 3000000000,
+    "retries": 3,
+    "startPeriod": 30000000000
+  },
+  "resources": {
+    "requests": {
+      "cpu": "0.5",
+      "memory": "512m"
+    },
+    "limits": {
+      "cpu": "2",
+      "memory": "2g"
+    },
+    "profiles": [
+      {
+        "name": "small",
+        "label": "Small (Development)",
+        "requests": {"cpu": "0.25", "memory": "256m"},
+        "limits": {"cpu": "0.5", "memory": "512m"}
+      },
+      {
+        "name": "medium",
+        "label": "Medium (Production)",
+        "requests": {"cpu": "0.5", "memory": "512m"},
+        "limits": {"cpu": "1", "memory": "1g"}
+      },
+      {
+        "name": "large",
+        "label": "Large (High Load)",
+        "requests": {"cpu": "1", "memory": "1g"},
+        "limits": {"cpu": "2", "memory": "2g"}
+      }
+    ]
+  },
+  "documentation": {
+    "officialDocs": "https://docs.mongodb.com/",
+    "dockerHub": "https://hub.docker.com/_/mongo",
+    "github": "https://github.com/mongodb/mongo",
+    "quickStart": "Set username and password to create your database"
+  },
+  "metadata": {
+    "author": "Uni-Deploy",
+    "license": "SSPL",
+    "createdAt": "2025-01-19T00:00:00Z",
+    "updatedAt": "2025-01-19T00:00:00Z"
+  }
+}

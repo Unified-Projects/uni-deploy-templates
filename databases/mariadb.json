@@ -1,0 +1,114 @@
+{
+  "id": "mariadb",
+  "name": "mariadb",
+  "displayName": "MariaDB",
+  "description": "Community-developed MySQL fork with enhanced features",
+  "longDescription": "MariaDB is a community-developed, commercially supported fork of MySQL. It's designed to maintain high compatibility with MySQL while adding new storage engines and features.",
+  "category": "database",
+  "tags": ["database", "sql", "relational", "mariadb", "mysql-compatible"],
+  "icon": {
+    "type": "simpleicons",
+    "value": "mariadb",
+    "color": "#003545"
+  },
+  "version": "1.0.0",
+  "image": "mariadb",
+  "imageTag": "11",
+  "imageTags": [
+    {"tag": "11", "label": "MariaDB 11 (Latest)", "recommended": true},
+    {"tag": "10.11", "label": "MariaDB 10.11 (LTS)"}
+  ],
+  "replication": {
+    "canReplicate": false,
+    "defaultReplicas": 1,
+    "minReplicas": 1,
+    "maxReplicas": 1,
+    "warnings": ["MariaDB requires Galera Cluster configuration for replication"]
+  },
+  "updateStrategy": {
+    "type": "recreate"
+  },
+  "requiredVariables": [
+    {
+      "key": "MARIADB_ROOT_PASSWORD",
+      "description": "Password for the root user",
+      "required": true,
+      "secret": true,
+      "validation": {"minLength": 8}
+    }
+  ],
+  "optionalVariables": [
+    {
+      "key": "MARIADB_DATABASE",
+      "description": "Default database to create",
+      "required": false
+    },
+    {
+      "key": "MARIADB_USER",
+      "description": "Additional user to create",
+      "required": false
+    },
+    {
+      "key": "MARIADB_PASSWORD",
+      "description": "Password for the additional user",
+      "required": false,
+      "secret": true
+    }
+  ],
+  "exposedVariables": [
+    {
+      "key": "DATABASE_URL",
+      "description": "Full MariaDB connection string",
+      "formula": "mysql://${MARIADB_USER}:${MARIADB_PASSWORD}@${service_name}:${port}/${MARIADB_DATABASE}",
+      "dependencies": ["MARIADB_USER", "MARIADB_PASSWORD", "MARIADB_DATABASE"],
+      "secret": true
+    },
+    {
+      "key": "MARIADB_HOST",
+      "description": "MariaDB hostname",
+      "formula": "${service_name}",
+      "dependencies": []
+    },
+    {
+      "key": "MARIADB_PORT",
+      "description": "MariaDB port",
+      "formula": "${port}",
+      "dependencies": []
+    }
+  ],
+  "ports": [{"name": "mariadb", "containerPort": 3306, "protocol": "tcp"}],
+  "volumes": [
+    {
+      "name": "mariadb-data",
+      "mountPath": "/var/lib/mysql",
+      "description": "MariaDB data directory",
+      "sizeRecommendation": "10Gi"
+    }
+  ],
+  "healthCheck": {
+    "test": ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"],
+    "interval": 10000000000,
+    "timeout": 3000000000,
+    "retries": 3,
+    "startPeriod": 30000000000
+  },
+  "resources": {
+    "requests": {"cpu": "0.25", "memory": "256m"},
+    "limits": {"cpu": "2", "memory": "2g"},
+    "profiles": [
+      {"name": "small", "label": "Small", "requests": {"cpu": "0.25", "memory": "256m"}, "limits": {"cpu": "0.5", "memory": "512m"}},
+      {"name": "medium", "label": "Medium", "requests": {"cpu": "0.5", "memory": "512m"}, "limits": {"cpu": "1", "memory": "1g"}},
+      {"name": "large", "label": "Large", "requests": {"cpu": "1", "memory": "1g"}, "limits": {"cpu": "2", "memory": "2g"}}
+    ]
+  },
+  "documentation": {
+    "officialDocs": "https://mariadb.com/kb/en/documentation/",
+    "dockerHub": "https://hub.docker.com/_/mariadb"
+  },
+  "metadata": {
+    "author": "Uni-Deploy",
+    "license": "GPL",
+    "createdAt": "2025-01-19T00:00:00Z",
+    "updatedAt": "2025-01-19T00:00:00Z"
+  }
+}

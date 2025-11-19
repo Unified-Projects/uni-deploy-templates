@@ -1,0 +1,106 @@
+{
+  "id": "redis",
+  "name": "redis",
+  "displayName": "Redis",
+  "description": "In-memory data structure store and cache",
+  "longDescription": "Redis is an open source, in-memory data structure store used as a database, cache, message broker, and streaming engine. It supports data structures such as strings, hashes, lists, sets, sorted sets with range queries, bitmaps, hyperloglogs, geospatial indexes, and streams.",
+  "category": "cache",
+  "tags": ["cache", "key-value", "in-memory", "redis"],
+  "icon": {
+    "type": "simpleicons",
+    "value": "redis",
+    "color": "#DC382D"
+  },
+  "version": "1.0.0",
+  "image": "redis",
+  "imageTag": "7-alpine",
+  "imageTags": [
+    {"tag": "7-alpine", "label": "Redis 7 (Alpine)", "recommended": true},
+    {"tag": "6-alpine", "label": "Redis 6 (Alpine)"}
+  ],
+  "replication": {
+    "canReplicate": true,
+    "defaultReplicas": 1,
+    "minReplicas": 1,
+    "maxReplicas": 5,
+    "warnings": ["Multiple replicas require Redis Sentinel or Cluster mode"],
+    "recommendations": "For HA, configure Redis Sentinel or use Redis Cluster"
+  },
+  "updateStrategy": {
+    "type": "rolling",
+    "rollingUpdate": {
+      "maxUnavailable": 0,
+      "maxSurge": 1,
+      "delay": 10
+    }
+  },
+  "requiredVariables": [],
+  "optionalVariables": [
+    {
+      "key": "REDIS_PASSWORD",
+      "description": "Password for Redis authentication",
+      "required": false,
+      "secret": true,
+      "validation": {"minLength": 8},
+      "helpText": "Highly recommended for production"
+    }
+  ],
+  "exposedVariables": [
+    {
+      "key": "REDIS_URL",
+      "description": "Full Redis connection string",
+      "formula": "redis://:${REDIS_PASSWORD}@${service_name}:${port}",
+      "dependencies": ["REDIS_PASSWORD"],
+      "secret": true,
+      "example": "redis://:password@my-redis:6379"
+    },
+    {
+      "key": "REDIS_HOST",
+      "description": "Redis hostname",
+      "formula": "${service_name}",
+      "dependencies": []
+    },
+    {
+      "key": "REDIS_PORT",
+      "description": "Redis port",
+      "formula": "${port}",
+      "dependencies": []
+    },
+    {
+      "key": "REDIS_PASSWORD",
+      "description": "Redis password",
+      "formula": "${REDIS_PASSWORD}",
+      "dependencies": ["REDIS_PASSWORD"],
+      "secret": true
+    }
+  ],
+  "ports": [{"name": "redis", "containerPort": 6379, "protocol": "tcp"}],
+  "healthCheck": {
+    "test": ["CMD", "redis-cli", "ping"],
+    "interval": 10000000000,
+    "timeout": 3000000000,
+    "retries": 3,
+    "startPeriod": 10000000000
+  },
+  "resources": {
+    "requests": {"cpu": "0.1", "memory": "128m"},
+    "limits": {"cpu": "1", "memory": "1g"},
+    "profiles": [
+      {"name": "small", "label": "Small", "requests": {"cpu": "0.1", "memory": "128m"}, "limits": {"cpu": "0.25", "memory": "256m"}},
+      {"name": "medium", "label": "Medium", "requests": {"cpu": "0.25", "memory": "256m"}, "limits": {"cpu": "0.5", "memory": "512m"}},
+      {"name": "large", "label": "Large", "requests": {"cpu": "0.5", "memory": "512m"}, "limits": {"cpu": "1", "memory": "1g"}}
+    ]
+  },
+  "documentation": {
+    "officialDocs": "https://redis.io/docs/",
+    "dockerHub": "https://hub.docker.com/_/redis",
+    "github": "https://github.com/redis/redis",
+    "quickStart": "Redis starts immediately. Set REDIS_PASSWORD for authentication."
+  },
+  "metadata": {
+    "author": "Uni-Deploy",
+    "license": "BSD",
+    "createdAt": "2025-01-19T00:00:00Z",
+    "updatedAt": "2025-01-19T00:00:00Z"
+  }
+}

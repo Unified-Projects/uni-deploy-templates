@@ -1,0 +1,188 @@
+{
+  "id": "mysql",
+  "name": "mysql",
+  "displayName": "MySQL",
+  "description": "Popular open-source relational database",
+  "longDescription": "MySQL is the world's most popular open-source database. With its proven performance, reliability, and ease-of-use, MySQL has become the leading database choice for web-based applications.",
+  "category": "database",
+  "tags": ["database", "sql", "relational", "mysql"],
+  "icon": {
+    "type": "simpleicons",
+    "value": "mysql",
+    "color": "#4479A1"
+  },
+  "version": "1.0.0",
+  "image": "mysql",
+  "imageTag": "8.0",
+  "imageTags": [
+    {
+      "tag": "8.0",
+      "label": "MySQL 8.0",
+      "description": "Latest stable release",
+      "recommended": true
+    },
+    {
+      "tag": "5.7",
+      "label": "MySQL 5.7",
+      "description": "Previous major version (EOL approaching)"
+    }
+  ],
+  "replication": {
+    "canReplicate": false,
+    "defaultReplicas": 1,
+    "minReplicas": 1,
+    "maxReplicas": 1,
+    "warnings": [
+      "MySQL requires master-slave replication configuration",
+      "Single-node deployments without HA",
+      "Consider MySQL InnoDB Cluster for production HA"
+    ]
+  },
+  "updateStrategy": {
+    "type": "recreate",
+    "order": "stop-first"
+  },
+  "restartPolicy": "any",
+  "requiredVariables": [
+    {
+      "key": "MYSQL_ROOT_PASSWORD",
+      "description": "Password for the MySQL root user",
+      "required": true,
+      "secret": true,
+      "validation": {
+        "minLength": 8
+      }
+    }
+  ],
+  "optionalVariables": [
+    {
+      "key": "MYSQL_DATABASE",
+      "description": "Default database to create",
+      "required": false,
+      "validation": {
+        "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$"
+      }
+    },
+    {
+      "key": "MYSQL_USER",
+      "description": "Additional MySQL user to create",
+      "required": false,
+      "validation": {
+        "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$"
+      }
+    },
+    {
+      "key": "MYSQL_PASSWORD",
+      "description": "Password for the additional user",
+      "required": false,
+      "secret": true,
+      "validation": {
+        "minLength": 8
+      }
+    }
+  ],
+  "exposedVariables": [
+    {
+      "key": "DATABASE_URL",
+      "description": "Full MySQL connection string",
+      "formula": "mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${service_name}:${port}/${MYSQL_DATABASE}",
+      "dependencies": ["MYSQL_USER", "MYSQL_PASSWORD", "MYSQL_DATABASE"],
+      "secret": true
+    },
+    {
+      "key": "MYSQL_HOST",
+      "description": "MySQL service hostname",
+      "formula": "${service_name}",
+      "dependencies": []
+    },
+    {
+      "key": "MYSQL_PORT",
+      "description": "MySQL service port",
+      "formula": "${port}",
+      "dependencies": []
+    },
+    {
+      "key": "MYSQL_USER",
+      "description": "MySQL username",
+      "formula": "${MYSQL_USER}",
+      "dependencies": ["MYSQL_USER"]
+    },
+    {
+      "key": "MYSQL_PASSWORD",
+      "description": "MySQL password",
+      "formula": "${MYSQL_PASSWORD}",
+      "dependencies": ["MYSQL_PASSWORD"],
+      "secret": true
+    },
+    {
+      "key": "MYSQL_DATABASE",
+      "description": "MySQL database name",
+      "formula": "${MYSQL_DATABASE}",
+      "dependencies": ["MYSQL_DATABASE"]
+    }
+  ],
+  "ports": [
+    {
+      "name": "mysql",
+      "containerPort": 3306,
+      "protocol": "tcp",
+      "expose": false
+    }
+  ],
+  "volumes": [
+    {
+      "name": "mysql-data",
+      "mountPath": "/var/lib/mysql",
+      "description": "MySQL data directory",
+      "sizeRecommendation": "10Gi"
+    }
+  ],
+  "healthCheck": {
+    "test": ["CMD", "mysqladmin", "ping", "-h", "localhost"],
+    "interval": 10000000000,
+    "timeout": 3000000000,
+    "retries": 3,
+    "startPeriod": 30000000000
+  },
+  "resources": {
+    "requests": {
+      "cpu": "0.25",
+      "memory": "256m"
+    },
+    "limits": {
+      "cpu": "2",
+      "memory": "2g"
+    },
+    "profiles": [
+      {
+        "name": "small",
+        "label": "Small (Development)",
+        "requests": {"cpu": "0.25", "memory": "256m"},
+        "limits": {"cpu": "0.5", "memory": "512m"}
+      },
+      {
+        "name": "medium",
+        "label": "Medium (Production)",
+        "requests": {"cpu": "0.5", "memory": "512m"},
+        "limits": {"cpu": "1", "memory": "1g"}
+      },
+      {
+        "name": "large",
+        "label": "Large (High Load)",
+        "requests": {"cpu": "1", "memory": "1g"},
+        "limits": {"cpu": "2", "memory": "2g"}
+      }
+    ]
+  },
+  "documentation": {
+    "officialDocs": "https://dev.mysql.com/doc/",
+    "dockerHub": "https://hub.docker.com/_/mysql",
+    "quickStart": "Set MYSQL_ROOT_PASSWORD to create your database"
+  },
+  "metadata": {
+    "author": "Uni-Deploy",
+    "license": "GPL",
+    "createdAt": "2025-01-19T00:00:00Z",
+    "updatedAt": "2025-01-19T00:00:00Z"
+  }
+}

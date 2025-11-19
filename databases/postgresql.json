@@ -1,0 +1,230 @@
+{
+  "id": "postgresql",
+  "name": "postgresql",
+  "displayName": "PostgreSQL",
+  "description": "Open-source relational database with advanced features",
+  "longDescription": "PostgreSQL is a powerful, open-source object-relational database system with over 35 years of active development. It has earned a strong reputation for reliability, feature robustness, and performance.",
+  "category": "database",
+  "tags": ["database", "sql", "relational", "postgres"],
+  "icon": {
+    "type": "simpleicons",
+    "value": "postgresql",
+    "color": "#4169E1"
+  },
+  "version": "1.0.0",
+  "image": "postgres",
+  "imageTag": "16-alpine",
+  "imageTags": [
+    {
+      "tag": "16-alpine",
+      "label": "PostgreSQL 16 (Alpine)",
+      "description": "Latest stable release, minimal Alpine-based image",
+      "recommended": true
+    },
+    {
+      "tag": "15-alpine",
+      "label": "PostgreSQL 15 (Alpine)",
+      "description": "Previous major version"
+    },
+    {
+      "tag": "14-alpine",
+      "label": "PostgreSQL 14 (Alpine)",
+      "description": "LTS version"
+    }
+  ],
+  "replication": {
+    "canReplicate": false,
+    "defaultReplicas": 1,
+    "minReplicas": 1,
+    "maxReplicas": 1,
+    "warnings": [
+      "PostgreSQL requires special configuration for replication",
+      "Single-node deployments do not support HA without additional setup",
+      "Consider using managed PostgreSQL or configuring streaming replication manually"
+    ],
+    "recommendations": "For production HA, use PostgreSQL with streaming replication or a managed service"
+  },
+  "updateStrategy": {
+    "type": "recreate",
+    "order": "stop-first"
+  },
+  "restartPolicy": "any",
+  "requiredVariables": [
+    {
+      "key": "POSTGRES_PASSWORD",
+      "description": "Password for the PostgreSQL superuser",
+      "required": true,
+      "secret": true,
+      "validation": {
+        "minLength": 8
+      },
+      "placeholder": "strong-password-here",
+      "helpText": "Use a strong password with at least 8 characters"
+    }
+  ],
+  "optionalVariables": [
+    {
+      "key": "POSTGRES_USER",
+      "description": "PostgreSQL superuser name",
+      "default": "postgres",
+      "required": false,
+      "placeholder": "postgres",
+      "validation": {
+        "pattern": "^[a-z][a-z0-9_]*$"
+      }
+    },
+    {
+      "key": "POSTGRES_DB",
+      "description": "Default database to create",
+      "default": "postgres",
+      "required": false,
+      "placeholder": "myapp",
+      "validation": {
+        "pattern": "^[a-z][a-z0-9_]*$"
+      }
+    }
+  ],
+  "exposedVariables": [
+    {
+      "key": "DATABASE_URL",
+      "description": "Full PostgreSQL connection string (format: postgresql://user:password@host:port/database)",
+      "formula": "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${service_name}:${port}/${POSTGRES_DB}",
+      "dependencies": ["POSTGRES_USER", "POSTGRES_PASSWORD", "POSTGRES_DB"],
+      "secret": true,
+      "example": "postgresql://postgres:password@my-postgres:5432/mydb"
+    },
+    {
+      "key": "POSTGRES_HOST",
+      "description": "PostgreSQL service hostname",
+      "formula": "${service_name}",
+      "dependencies": [],
+      "example": "my-postgres"
+    },
+    {
+      "key": "POSTGRES_PORT",
+      "description": "PostgreSQL service port",
+      "formula": "${port}",
+      "dependencies": [],
+      "example": "5432"
+    },
+    {
+      "key": "POSTGRES_USER",
+      "description": "PostgreSQL username",
+      "formula": "${POSTGRES_USER}",
+      "dependencies": ["POSTGRES_USER"],
+      "example": "postgres"
+    },
+    {
+      "key": "POSTGRES_PASSWORD",
+      "description": "PostgreSQL password",
+      "formula": "${POSTGRES_PASSWORD}",
+      "dependencies": ["POSTGRES_PASSWORD"],
+      "secret": true,
+      "example": "password123"
+    },
+    {
+      "key": "POSTGRES_DB",
+      "description": "PostgreSQL database name",
+      "formula": "${POSTGRES_DB}",
+      "dependencies": ["POSTGRES_DB"],
+      "example": "mydb"
+    }
+  ],
+  "ports": [
+    {
+      "name": "postgresql",
+      "containerPort": 5432,
+      "protocol": "tcp",
+      "expose": false,
+      "description": "PostgreSQL server port"
+    }
+  ],
+  "volumes": [
+    {
+      "name": "postgres-data",
+      "mountPath": "/var/lib/postgresql/data",
+      "description": "PostgreSQL data directory",
+      "readOnly": false,
+      "sizeRecommendation": "10Gi"
+    }
+  ],
+  "healthCheck": {
+    "test": ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"],
+    "interval": 10000000000,
+    "timeout": 3000000000,
+    "retries": 3,
+    "startPeriod": 30000000000
+  },
+  "resources": {
+    "requests": {
+      "cpu": "0.25",
+      "memory": "256m"
+    },
+    "limits": {
+      "cpu": "2",
+      "memory": "2g"
+    },
+    "profiles": [
+      {
+        "name": "small",
+        "label": "Small (Development)",
+        "requests": {
+          "cpu": "0.25",
+          "memory": "256m"
+        },
+        "limits": {
+          "cpu": "0.5",
+          "memory": "512m"
+        }
+      },
+      {
+        "name": "medium",
+        "label": "Medium (Small Production)",
+        "requests": {
+          "cpu": "0.5",
+          "memory": "512m"
+        },
+        "limits": {
+          "cpu": "1",
+          "memory": "1g"
+        }
+      },
+      {
+        "name": "large",
+        "label": "Large (Production)",
+        "requests": {
+          "cpu": "1",
+          "memory": "1g"
+        },
+        "limits": {
+          "cpu": "2",
+          "memory": "2g"
+        }
+      },
+      {
+        "name": "xlarge",
+        "label": "Extra Large (High Traffic)",
+        "requests": {
+          "cpu": "2",
+          "memory": "2g"
+        },
+        "limits": {
+          "cpu": "4",
+          "memory": "4g"
+        }
+      }
+    ]
+  },
+  "documentation": {
+    "officialDocs": "https://www.postgresql.org/docs/",
+    "dockerHub": "https://hub.docker.com/_/postgres",
+    "github": "https://github.com/postgres/postgres",
+    "quickStart": "Set POSTGRES_PASSWORD to create your database. Connect using the DATABASE_URL output."
+  },
+  "metadata": {
+    "author": "Uni-Deploy",
+    "license": "PostgreSQL License",
+    "createdAt": "2025-01-19T00:00:00Z",
+    "updatedAt": "2025-01-19T00:00:00Z"
+  }
+}

@@ -1,0 +1,543 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Uni-Deploy Template Schema",
+  "description": "Schema for uni-deploy service templates",
+  "type": "object",
+  "required": ["id", "name", "displayName", "description", "category", "image", "imageTag", "version"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for the template (lowercase, hyphenated)",
+      "pattern": "^[a-z0-9-]+$"
+    },
+    "name": {
+      "type": "string",
+      "description": "Internal name for the template"
+    },
+    "displayName": {
+      "type": "string",
+      "description": "Human-readable display name"
+    },
+    "description": {
+      "type": "string",
+      "description": "Short description of the service"
+    },
+    "longDescription": {
+      "type": "string",
+      "description": "Detailed description with use cases"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "database",
+        "cache",
+        "message-queue",
+        "web-server",
+        "proxy",
+        "runtime",
+        "monitoring",
+        "search",
+        "storage",
+        "cdn",
+        "developer-tools",
+        "security",
+        "custom"
+      ]
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Tags for filtering and search"
+    },
+    "icon": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["url", "simpleicons", "devicon"]
+        },
+        "value": {
+          "type": "string",
+          "description": "URL or icon identifier"
+        },
+        "color": {
+          "type": "string",
+          "description": "Hex color code for the icon",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        }
+      }
+    },
+    "version": {
+      "type": "string",
+      "description": "Template schema version",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "image": {
+      "type": "string",
+      "description": "Docker image name"
+    },
+    "imageTag": {
+      "type": "string",
+      "description": "Default Docker image tag"
+    },
+    "imageTags": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["tag", "label"],
+        "properties": {
+          "tag": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "recommended": {
+            "type": "boolean"
+          }
+        }
+      },
+      "description": "Available image tags with descriptions"
+    },
+    "imageAlternatives": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["image", "imageTag", "label"],
+        "properties": {
+          "image": {
+            "type": "string"
+          },
+          "imageTag": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "architecture": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["amd64", "arm64", "arm/v7"]
+            }
+          }
+        }
+      },
+      "description": "Alternative images for different architectures"
+    },
+    "replication": {
+      "type": "object",
+      "required": ["canReplicate"],
+      "properties": {
+        "canReplicate": {
+          "type": "boolean",
+          "description": "Whether this service can be safely replicated"
+        },
+        "defaultReplicas": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 1
+        },
+        "minReplicas": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        },
+        "maxReplicas": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Warnings about replication limitations"
+        },
+        "recommendations": {
+          "type": "string",
+          "description": "Best practices for replication"
+        }
+      }
+    },
+    "updateStrategy": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["rolling", "recreate", "blue-green"],
+          "description": "Update strategy type"
+        },
+        "rollingUpdate": {
+          "type": "object",
+          "properties": {
+            "maxUnavailable": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "maxSurge": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "delay": {
+              "type": "integer",
+              "description": "Delay between updates in seconds"
+            }
+          }
+        },
+        "order": {
+          "type": "string",
+          "enum": ["start-first", "stop-first"],
+          "default": "stop-first"
+        }
+      }
+    },
+    "restartPolicy": {
+      "type": "string",
+      "enum": ["none", "on-failure", "any"],
+      "default": "any"
+    },
+    "requiredVariables": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/templateVariable"
+      }
+    },
+    "optionalVariables": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/templateVariable"
+      }
+    },
+    "exposedVariables": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/exposedVariable"
+      },
+      "description": "Variables exposed to other services (outputs)"
+    },
+    "ports": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["containerPort"],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "containerPort": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 65535
+          },
+          "protocol": {
+            "type": "string",
+            "enum": ["tcp", "udp", "sctp"],
+            "default": "tcp"
+          },
+          "expose": {
+            "type": "boolean",
+            "description": "Whether to expose externally",
+            "default": false
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "volumes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "mountPath"],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "mountPath": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "readOnly": {
+            "type": "boolean",
+            "default": false
+          },
+          "sizeRecommendation": {
+            "type": "string",
+            "description": "Recommended volume size (e.g., '10Gi', '100Gi')"
+          }
+        }
+      }
+    },
+    "healthCheck": {
+      "type": "object",
+      "required": ["test"],
+      "properties": {
+        "test": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Health check command"
+        },
+        "interval": {
+          "type": "integer",
+          "description": "Interval in nanoseconds",
+          "default": 10000000000
+        },
+        "timeout": {
+          "type": "integer",
+          "description": "Timeout in nanoseconds",
+          "default": 3000000000
+        },
+        "retries": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 3
+        },
+        "startPeriod": {
+          "type": "integer",
+          "description": "Start period in nanoseconds",
+          "default": 10000000000
+        }
+      }
+    },
+    "resources": {
+      "type": "object",
+      "properties": {
+        "requests": {
+          "type": "object",
+          "properties": {
+            "cpu": {
+              "type": "string",
+              "description": "CPU request (e.g., '0.5', '1')"
+            },
+            "memory": {
+              "type": "string",
+              "description": "Memory request (e.g., '128m', '1g')"
+            }
+          }
+        },
+        "limits": {
+          "type": "object",
+          "properties": {
+            "cpu": {
+              "type": "string",
+              "description": "CPU limit (e.g., '1', '2')"
+            },
+            "memory": {
+              "type": "string",
+              "description": "Memory limit (e.g., '512m', '2g')"
+            }
+          }
+        },
+        "profiles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "requests"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "enum": ["small", "medium", "large", "xlarge"]
+              },
+              "label": {
+                "type": "string"
+              },
+              "requests": {
+                "type": "object",
+                "properties": {
+                  "cpu": {"type": "string"},
+                  "memory": {"type": "string"}
+                }
+              },
+              "limits": {
+                "type": "object",
+                "properties": {
+                  "cpu": {"type": "string"},
+                  "memory": {"type": "string"}
+                }
+              }
+            }
+          },
+          "description": "Predefined resource profiles"
+        }
+      }
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["templateId"],
+        "properties": {
+          "templateId": {
+            "type": "string"
+          },
+          "optional": {
+            "type": "boolean",
+            "default": false
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Other templates this service typically needs"
+    },
+    "labels": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "commands": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Default command to run"
+    },
+    "args": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Default arguments"
+    },
+    "documentation": {
+      "type": "object",
+      "properties": {
+        "officialDocs": {
+          "type": "string",
+          "format": "uri"
+        },
+        "dockerHub": {
+          "type": "string",
+          "format": "uri"
+        },
+        "github": {
+          "type": "string",
+          "format": "uri"
+        },
+        "quickStart": {
+          "type": "string"
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "author": {
+          "type": "string"
+        },
+        "license": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  },
+  "definitions": {
+    "templateVariable": {
+      "type": "object",
+      "required": ["key", "description"],
+      "properties": {
+        "key": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]*$"
+        },
+        "description": {
+          "type": "string"
+        },
+        "default": {
+          "type": "string"
+        },
+        "required": {
+          "type": "boolean",
+          "default": false
+        },
+        "secret": {
+          "type": "boolean",
+          "default": false
+        },
+        "validation": {
+          "type": "object",
+          "properties": {
+            "pattern": {
+              "type": "string"
+            },
+            "minLength": {
+              "type": "integer"
+            },
+            "maxLength": {
+              "type": "integer"
+            },
+            "enum": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "placeholder": {
+          "type": "string"
+        },
+        "helpText": {
+          "type": "string"
+        }
+      }
+    },
+    "exposedVariable": {
+      "type": "object",
+      "required": ["key", "description"],
+      "properties": {
+        "key": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]*$"
+        },
+        "description": {
+          "type": "string"
+        },
+        "formula": {
+          "type": "string",
+          "description": "Template string with ${VAR} interpolation"
+        },
+        "dependencies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Variables this output depends on"
+        },
+        "secret": {
+          "type": "boolean",
+          "default": false
+        },
+        "example": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

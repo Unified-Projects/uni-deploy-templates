@@ -1,0 +1,53 @@
+{
+  "id": "cloudflared",
+  "name": "cloudflared",
+  "displayName": "Cloudflare Tunnel",
+  "description": "Cloudflare Tunnel daemon for secure zero-trust access",
+  "longDescription": "Cloudflared connects your infrastructure to Cloudflare without opening any inbound ports, using Cloudflare Tunnel.",
+  "category": "proxy",
+  "tags": ["tunnel", "proxy", "cloudflare", "zero-trust"],
+  "icon": {
+    "type": "simpleicons",
+    "value": "cloudflare",
+    "color": "#F38020"
+  },
+  "version": "1.0.0",
+  "image": "cloudflare/cloudflared",
+  "imageTag": "latest",
+  "replication": {
+    "canReplicate": true,
+    "defaultReplicas": 1,
+    "minReplicas": 1,
+    "maxReplicas": 3,
+    "recommendations": "Multiple replicas provide redundancy"
+  },
+  "updateStrategy": {
+    "type": "rolling"
+  },
+  "requiredVariables": [
+    {
+      "key": "TUNNEL_TOKEN",
+      "description": "Cloudflare Tunnel token from dashboard",
+      "required": true,
+      "secret": true,
+      "helpText": "Get this from Cloudflare Zero Trust dashboard"
+    }
+  ],
+  "optionalVariables": [],
+  "exposedVariables": [],
+  "ports": [],
+  "commands": ["tunnel", "--no-autoupdate", "run", "--token", "${TUNNEL_TOKEN}"],
+  "resources": {
+    "requests": {"cpu": "0.1", "memory": "64m"},
+    "limits": {"cpu": "0.25", "memory": "128m"}
+  },
+  "documentation": {
+    "officialDocs": "https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/",
+    "dockerHub": "https://hub.docker.com/r/cloudflare/cloudflared"
+  },
+  "metadata": {
+    "author": "Uni-Deploy",
+    "createdAt": "2025-01-19T00:00:00Z",
+    "updatedAt": "2025-01-19T00:00:00Z"
+  }
+}
