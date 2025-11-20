@@ -7,8 +7,8 @@
   "category": "cache",
   "tags": ["cache", "key-value", "redis-compatible", "multithreading"],
   "icon": {
-    "type": "url",
-    "value": "https://docs.keydb.dev/img/logo.svg",
+    "type": "simpleicons",
+    "value": "redis",
     "color": "#DC382D"
   },
   "version": "1.0.0",

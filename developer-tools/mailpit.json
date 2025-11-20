@@ -7,8 +7,8 @@
   "category": "developer-tools",
   "tags": ["email", "smtp", "testing", "development"],
   "icon": {
-    "type": "url",
-    "value": "https://raw.githubusercontent.com/axllent/mailpit/develop/server/ui/favicon.svg",
+    "type": "lucide",
+    "value": "mail",
     "color": "#4A90E2"
   },
   "version": "1.0.0",

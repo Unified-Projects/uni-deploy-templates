@@ -7,8 +7,8 @@
   "category": "search",
   "tags": ["search", "full-text", "typo-tolerant", "fast"],
   "icon": {
-    "type": "url",
-    "value": "https://raw.githubusercontent.com/meilisearch/meilisearch/main/assets/logo.svg",
+    "type": "simpleicons",
+    "value": "meilisearch",
     "color": "#FF5CAA"
   },
   "version": "1.0.0",

@@ -7,8 +7,8 @@
   "category": "message-queue",
   "tags": ["message-queue", "cloud-native", "microservices", "pub-sub"],
   "icon": {
-    "type": "url",
-    "value": "https://nats.io/img/logos/nats-icon-color.svg",
+    "type": "lucide",
+    "value": "message-circle",
     "color": "#27AAE1"
   },
   "version": "1.0.0",

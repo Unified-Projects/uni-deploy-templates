@@ -7,8 +7,8 @@
   "category": "cache",
   "tags": ["cache", "memory", "distributed"],
   "icon": {
-    "type": "url",
-    "value": "https://cdn.worldvectorlogo.com/logos/memcached.svg",
+    "type": "lucide",
+    "value": "database",
     "color": "#00ADD8"
   },
   "version": "1.0.0",

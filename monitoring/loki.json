@@ -7,8 +7,8 @@
   "category": "monitoring",
   "tags": ["monitoring", "logs", "aggregation", "observability"],
   "icon": {
-    "type": "url",
-    "value": "https://grafana.com/static/img/logos/logo-loki.svg",
+    "type": "lucide",
+    "value": "file-text",
     "color": "#F46800"
   },
   "version": "1.0.0",
